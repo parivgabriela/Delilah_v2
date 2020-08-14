@@ -12,5 +12,6 @@ api.listen(3000, (req,res) => {
 });
 api.post('/usuarios', (req, res, next) => {
     const { usuario, nombre_ape, mail, telefono, domicilio, psw } = req.query;
-    //res.send(usuario);
+    res.send("ok");
 });
+

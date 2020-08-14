@@ -37,24 +37,27 @@ const estadoDeServer={
     };
 //prueba para ejecutar la consola
 let usuarios = [{
-    nombre_ape: "lolo pari",
     usuario: "lolopari",
+    nombre_ape: "lolo pari",
+    mail: "lolo@gmail.com",
+    telefono: "12344555",
     domicilio: "estados unidos",
     psw: "lolo",
-    mail: "lolo@gmail.com",
     rol: true
 },
 {
     usuario: "charlotte",
     nombre_ape: "charlotte pari",
     mail: "charlotte@gmail.com",
-    telefono:"123441"
+    telefono: "123441",
     domicilio: "francia",
     psw: "charlotte",
- 
     rol: false
 }
 ];
+let pedidos=[{
+    
+}]
 //utils.mensajeServer.
 //utils.estadoPedidos.
 //utils.estadoDeServer
