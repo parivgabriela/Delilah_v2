@@ -1,12 +1,15 @@
+--Se elimina alguna 
+DROP DATABASE databasename; 
+CREATE DATABASE delilah; 
+
 --Estos comandos eliminan las tablas en caso de que existan
 DROP TABLE usuarios;
 DROP TABLE pedidos;
 DROP TABLE pedidos_platos;
 DROP TABLE platos;
 
-
 -- Table Creation
-CREATE TABLE usuario (
+CREATE TABLE usuarios (
   id_usuario INT PRIMARY KEY AUTO_INCREMENT,
   usuario VARCHAR (60) NOT NULL,
   nombre_apellido VARCHAR (60) NOT NULL,
@@ -29,7 +32,7 @@ CREATE TABLE platos (
   id_plato INT PRIMARY KEY AUTO_INCREMENT,
   nombre_plato VARCHAR (60) NOT NULL,
   precio FLOAT NOT NULL,
-  url_plato VARCHAR(200) NOT NULL,
+  url_plato VARCHAR(200) NOT NULL
 );
 
 CREATE TABLE carritos (
@@ -39,7 +42,7 @@ CREATE TABLE carritos (
   cantidad INT NOT NULL
 );
 
-INSERT INTO USUARIO VALUES (NULL,"user1","Fulani TA","aa@gmail.com","4343456","ESTADOS UNIDOS 444","1234",FALSE);
-INSERT INTO USUARIO VALUES (NULL,"3user","Fulani TE","aa@gmail.com","4343456","La plata 444","1234",FALSE);
-INSERT INTO USUARIO VALUES (NULL,"4user","Fulani TI","aa@gmail.com","4343456","Juramento 444","1234",FALSE);
-INSERT INTO USUARIO VALUES (NULL,"5user","Fulani TO","aa@gmail.com","4343456","Jujuy 444","1234",FALSE);
+INSERT INTO usuarios VALUES (NULL,"user1","Fulani TA","aa@gmail.com","4343456","ESTADOS UNIDOS 444","1234",FALSE);
+INSERT INTO usuarios VALUES (NULL,"3user","Fulani TE","aa@gmail.com","4343456","La plata 444","1234",FALSE);
+INSERT INTO usuarios VALUES (NULL,"4user","Fulani TI","aa@gmail.com","4343456","Juramento 444","1234",FALSE);
+INSERT INTO usuarios VALUES (NULL,"5user","Fulani TO","aa@gmail.com","4343456","Jujuy 444","1234",FALSE);
