@@ -6,10 +6,10 @@ const sqlite=require('sqlite3');
 const database=require('./DB/db');
 const db=new sqlite.Database('./delilah.sqlite',(err)=>console.log(err));
 const is_admin=1,not_admin=0;
-var id_usuario=5;
+var id_usuario=6;
 const api = express();
 api.use(bodyParser.json());
-api.use(bodyParser.urlencoded({extended:false}));
+//api.use(bodyParser.urlencoded({extended:false}));
 
 function inicializarDB(){
   db.serialize(function() {
@@ -43,15 +43,13 @@ api.post('/usuarios', (req, res, next) => {
     try{
       //rever que onda con los inser cuando se reemplaza, pero viene por aqui la cosa
       db.serialize(function() {
-     db.run("INSERT INTO usuarios VALUES (?,?,?,?,?,?,?,?)",id_usuario,usuario, nombre_apellido, mail, telefono, domicilio, password,not_admin);
-   //  var stmt=db.prepare("INSERT INTO usuarios VALUES ("+id_usuario+","+usuario+","+nombre_apellido+","+mail+","+telefono+","+domicilio+","+password+",FALSE");
-   //stmt.run(id_usuario,usuario, nombre_apellido, mail, telefono, domicilio, password,not_admin);
-   //stmt.finalize();
-   db.all('select * from usuarios',(err,resultados)=>{
-    console.log(resultados);
-});
+      db.run("INSERT INTO usuarios VALUES (?,?,?,?,?,?,?,?)",id_usuario,usuario, nombre_apellido, mail, telefono, domicilio, password,not_admin);
+      id_usuario++; 
+      db.all('select * from usuarios',(err,resultados)=>{
+          console.log(resultados);
+        });
       });
-next();
+      next();
     }
     catch (error) {
 		console.log(error);
@@ -59,11 +57,12 @@ next();
 	}
    
 });
-api.get('/usuarios', (req, res) => {
+api.get('/usuarios', (req, res,next) => {
   //console.log(req);
-  const { usuario_o_mail, password } = req.body;
-  const usuarioEncontrado = comprobarCuentaIngreso(usuario_o_mail, password);
-  if (!usuarioEncontrado) {
+  const { usuario, password } = req.body;
+  console.log("usuario "+ usuario);
+  const usuarioEncontrado = comprobarCuentaIngreso(usuario, password);
+  if (usuarioEncontrado) {
       res.send('Error, no se encontro usuario/mail inexistente en el sistema');
       res.status(utils.estadoDeServer.statusErrorCliente);
   }
@@ -73,8 +72,15 @@ api.get('/usuarios', (req, res) => {
 });
 
 function comprobarCuentaIngreso(usuario_o_mail, password) {
-  db.all('select usuario,mail from usuarios',(err,resultados)=>{
-    console.log(resultados);
-});
+  db.serialize(function(){
+    db.run('SELECT * FROM usuarios WHERE mail=?',usuario_o_mail,(err,resultados)=>{
+      //if(usuario_o_mail===resultados.usuario || usuario_o_mail===resultados.mail);
+      console.log("Los resultados son "+resultados);
+      console.log(err);
+      return true;
+      //console.log(err);
+  });
+  })
+
 }
 
