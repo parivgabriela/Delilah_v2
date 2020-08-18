@@ -8,6 +8,7 @@ const statusOk = 200,
     const statusOkMensaje = 'Ingreso exitoso',
     statusOkValidacionMensaje="Usuario verificado",
     statusOkPedidoMensaje="Pedido ingresado exitosamente",
+    statusOkConsulta="Su consulta fue realizada exitosamente",
     statusErrorClienteMensaje ='Datos incorrectos',//bad request
     statusErrorCredencialesMensaje='Credencial inválida, no puede ingresar',//Unauthorized
     statusNotFoundMensaje='status not found',
@@ -29,12 +30,16 @@ const estadoDeServer={
         statusOkMensaje,
         statusOkValidacionMensaje,
         statusOkPedidoMensaje,
+        statusOkConsulta,
         statusErrorClienteMensaje,
         statusErrorCredencialesMensaje,
         statusNotFoundMensaje, 
         statusErrorServidorMensaje,
         statusCargadoCarritoMensaje
     };
+
+const efectivo="efectivo",debito="debito",credito="credito";
+const tPagos={efectivo,debito,credito};
 //prueba para ejecutar la consola
 let usuarios = [{
     usuario: "lolopari",
@@ -61,4 +66,4 @@ let pedidos=[{
 //utils.mensajeServer.
 //utils.estadoPedidos.
 //utils.estadoDeServer
-module.exports = { estadoDeServer,estadoPedidos,mensajeServer};
+module.exports = { estadoDeServer,estadoPedidos,mensajeServer,tPagos};
