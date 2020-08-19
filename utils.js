@@ -38,7 +38,7 @@ const estadoDeServer={
         statusCargadoCarritoMensaje
     };
 
-const efectivo="efectivo",debito="debito",credito="credito";
+const efectivo=1,debito=2,credito=3;
 const tPagos={efectivo,debito,credito};
 //prueba para ejecutar la consola
 let usuarios = [{

@@ -19,7 +19,7 @@ function inicializarDB(){
      db.run('DROP TABLE platos');
      db.run('DROP TABLE carritos');
      db.run("CREATE TABLE usuarios ( id_usuario INT PRIMARY KEY NOT NULL, usuario VARCHAR (60) NOT NULL, nombre_apellido VARCHAR (60) NOT NULL, mail VARCHAR(60) NOT NULL, telefono VARCHAR(20) NOT NULL, domicilio VARCHAR (60) NOT NULL, password VARCHAR(20) NOT NULL, is_admin BOOLEAN NOT NULL DEFAULT FALSE)");
-     db.run('CREATE TABLE pedidos (id_pedido INT PRIMARY KEY NOT NULL,t_pago VARCHAR (60) NOT NULL,estado_pedido VARCHAR(60) NOT NULL,date DATETIME NOT NULL,total VARCHAR(20) NOT NULL,id_user INT NOT NULL,id_carrito INT NOT NULL)');
+     db.run('CREATE TABLE pedidos (id_pedido INT PRIMARY KEY NOT NULL,t_pago INT NOT NULL,estado_pedido INT NOT NULL,date DATETIME NOT NULL,total VARCHAR(20) NOT NULL,id_user INT NOT NULL,id_carrito INT NOT NULL)');
      db.run('CREATE TABLE platos (id_plato INT PRIMARY KEY ,nombre_plato VARCHAR (60) NOT NULL,precio FLOAT NOT NULL,url_plato VARCHAR(200) NOT NULL)');
      db.run('CREATE TABLE carritos (id_carrito INT PRIMARY KEY,id_pedido INT NOT NULL,id_plato INT NOT NULL,cantidad INT NOT NULL)');
 
@@ -109,25 +109,20 @@ api.post('/platos', (req, res, next) => {
 
 });
 
-
 api.post('/pedidos', (req, res, next) => {
   //verificar que el usuario este activo--> se haya logueado
   const { t_pago, id_usuario, domicilio, total, carrito } = req.body;
   console.log(t_pago, id_usuario, domicilio, total, carrito);
   var fecha = new Date();
-  
+  // pedidos (id_pedido INT,t_pago VARCHAR,estado_pedido VARCHAR,date ,total ,id_user INT ,id_carrito )'); 
   try {
       db.serialize(function() {
-          db.run('INSERT INTO pedidos VALUES (?,?,?,?,?,?,?)', id_pedido, t_pago, utils.estadoPedidos.pedidoNuevo, fecha, total, (err, resultados) => {
-              id_pedido++;
-          });
-          db.all('INSERT INTO carritos VALUES (?,?,?,?)', id_carrito, id_pedido, carrito[0].id_plato, carrito[0].cantidad,(err,resultados)=>{
-            //if(usuario_o_mail===resultados.usuario || usuario_o_mail===resultados.mail);
-            console.log("Los resultados son "+resultados);
-            console.log(err);
+          db.all('INSERT INTO pedidos VALUES (?,?,?,?,?,?,?)', id_pedido, t_pago, utils.estadoPedidos.pedidoNuevo, fecha, total,id_usuario,id_carrito);
+          db.all('INSERT INTO carritos VALUES (?,?,?,?)', id_carrito, id_pedido, carrito[0].id_plato, carrito[0].cantidad);
           id_carrito++;
         });
-      });
+        selectCarritos();
+        selectpedidos();
      // cargarCarrito(carrito);
       res.status(utils.mensajeServer.statusOkConsulta);
       res.status(utils.estadoDeServer.statusOk);
@@ -142,12 +137,13 @@ api.post('/pedidos', (req, res, next) => {
 api.post('/carritos', (req, res, next) => {
   const {id_pedido, carrito } = req.body;
   db.serialize(function() {
-    db.run('INSERT INTO carritos VALUES (?,?,?,?)', 11, 11,11, 1,(err,resultados)=>{
+    db.all('INSERT INTO carritos VALUES (?,?,?,?)', 11, 11,11, 1,(err,resultados)=>{
       console.log("Los resultados son "+resultados);
       console.log(err);
     id_carrito++;
   });
   });
+  selectCarritos();
 })
 function cargarCarrito(unCarrito) {
   for (let i = 0; i < unCarrito.length; i++) {
@@ -180,15 +176,18 @@ function selectpedidos(){
    });
 })
 }
-
-function selectCarritos(){
+function cargarCarrito(){
   db.serialize(function() {
     db.all('INSERT INTO carritos VALUES (4,4,4,4)');
-
+    db.all('INSERT INTO carritos VALUES (5,6,4,1)');
+});
+}
+function selectCarritos(){
+  db.serialize(function() {
     db.all('select * from carritos',(err,resultados)=>{
        console.log(resultados);
    });
 })
 }
-selectCarritos();
+cargarCarrito();
 
