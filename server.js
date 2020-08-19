@@ -100,6 +100,7 @@ api.get('/login', (req, res,next) => {
   usuario_activo(usuario);
 });
 
+
 api.get('/platos', (req, res, next) => {
   db.serialize(function() {
       db.all('SELECT * from platos', (err, resultados) => {
@@ -209,7 +210,7 @@ return true;
 }
 
   
-  function usuario_activo(usuario){
+  function usuarioActivo(usuario){
     var idUsuario=0;
     db.serialize(function() {
       db.all('select id_usuario from usuarios where usuario=?',usuario,(err,resultados)=>{
