@@ -20,7 +20,7 @@ function inicializarDB(){
      db.run('DROP TABLE carritos');
      db.run("CREATE TABLE usuarios ( id_usuario INT PRIMARY KEY NOT NULL, usuario VARCHAR (60) NOT NULL, nombre_apellido VARCHAR (60) NOT NULL, mail VARCHAR(60) NOT NULL, telefono VARCHAR(20) NOT NULL, domicilio VARCHAR (60) NOT NULL, password VARCHAR(20) NOT NULL, is_admin BOOLEAN NOT NULL DEFAULT FALSE)");
      db.run('CREATE TABLE pedidos (id_pedido INT PRIMARY KEY NOT NULL,t_pago INT NOT NULL,estado_pedido INT NOT NULL,date DATETIME NOT NULL,total VARCHAR(20) NOT NULL,id_user INT NOT NULL,id_carrito INT NOT NULL)');
-     db.run('CREATE TABLE platos (id_plato INT PRIMARY KEY ,nombre_plato VARCHAR (60) NOT NULL,precio FLOAT NOT NULL,url_plato VARCHAR(200) NOT NULL)');
+     db.run('CREATE TABLE platos (id_plato INT PRIMARY KEY ,nombre_plato VARCHAR (60) NOT NULL,precio FLOAT NOT NULL,stock INT NOT NULL,url_plato VARCHAR(200) NOT NULL)');
      db.run('CREATE TABLE carritos (id_carrito INT PRIMARY KEY,id_pedido INT NOT NULL,id_plato INT NOT NULL,cantidad INT NOT NULL)');
 
   });
@@ -30,7 +30,7 @@ function inicializarDB(){
           db.all('INSERT INTO usuarios VALUES (3,"4user","Fulani TI","aa@gmail.com","4343456","Juramento 444","1234",FALSE)');
           db.all('INSERT INTO usuarios VALUES (4,"5user","Fulani TO","aa@gmail.com","4343456","Jujuy 444","1234",FALSE)');
 
-          db.all('INSERT INTO platos VALUES (50,"pizza","300","https://www.delonghi.com/Global/recipes/multifry/pizza_fresca.jpg")');
+          db.all('INSERT INTO platos VALUES (50,"pizza","300",2,"https://www.delonghi.com/Global/recipes/multifry/pizza_fresca.jpg")');
 
           db.all('select * from usuarios',(err,resultados)=>{
              console.log(resultados);
@@ -68,9 +68,21 @@ api.post('/usuarios', (req, res, next) => {
 	}
    
 });
-api.post('/usuarios', (req, res, next) => {
-if(!usuario_activo && esAdmin(usuario_activo)){
 
+api.get('/usuarios', (req, res, next) => {
+if(!usuario_activo && esAdmin(usuario_activo)){
+  db.serialize(function() {
+    db.all('SELECT * from usuarios', (err, resultados) => {
+        console.log(resultados);
+    });
+  });
+}
+else{
+  db.serialize(function() {
+    db.all('SELECT * from usuarios where id=?',usuario_activo, (err, resultados) => {
+        console.log(resultados);
+    });
+});
 }
 });
 
@@ -85,6 +97,7 @@ api.get('/login', (req, res,next) => {
   }
   res.status(utils.mensajeServer.statusOkMensaje);
   res.status(utils.estadoDeServer.statusOk);
+  usuario_activo(usuario);
 });
 
 api.get('/platos', (req, res, next) => {
@@ -99,9 +112,9 @@ api.get('/platos', (req, res, next) => {
 
 //agregar modificacion de admin
 api.post('/platos', (req, res, next) => {
-  const { nombre_plato,precio, url_plato } = req.body;
+  const { nombre_plato,precio, url_plato ,stock} = req.body;
   db.serialize(function() {
-    db.run("INSERT INTO platos VALUES (?,?,?,?)",id_plato,nombre_plato, precio,url_plato);
+    db.run("INSERT INTO platos VALUES (?,?,?,?,?)",id_plato,nombre_plato, precio,stock,url_plato);
     id_plato++;
     res.send(utils.mensajeServer.statusOkConsulta);
     res.status(utils.estadoDeServer.statusOk);
@@ -123,7 +136,6 @@ api.post('/pedidos', (req, res, next) => {
         });
         selectCarritos();
         selectpedidos();
-     // cargarCarrito(carrito);
       res.status(utils.mensajeServer.statusOkConsulta);
       res.status(utils.estadoDeServer.statusOk);
       next();
@@ -190,4 +202,20 @@ function selectCarritos(){
 })
 }
 cargarCarrito();
+function esAdmin(idUsuario){
 
+  //revisar tokens para verificar ese tema
+return true;
+}
+
+  
+  function usuario_activo(usuario){
+    var idUsuario=0;
+    db.serialize(function() {
+      db.all('select id_usuario from usuarios where usuario=?',usuario,(err,resultados)=>{
+         console.log(resultados);
+         idUsuario=resultados;
+     });
+  })
+  return idUsuario;
+  } 
