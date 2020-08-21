@@ -213,33 +213,35 @@ function cargarCarrito(unCarrito) {
 }
   //if(typeof mail==='undefined') con esto compruebo cual ingreso
   //en caso de que no exista retornar 0 
-function comprobarCuentaIngreso(usuario,mail, password) {
-let unUsuario=0; 
-if(typeof mail==='undefined'){
-  db.serialize(function(){
-    
-      db.all('SELECT id_usuario FROM usuarios WHERE usuario=?',usuario,(err,resultados)=>{
-        //if(usuario_o_mail===resultados.usuario || usuario_o_mail===resultados.mail);
-        console.log("Los usuario son "+resultados);
-        console.log(err);
-        unUsuario= resultados;
-    });
-  });
-}
-else{
-  db.serialize(function(){
-    db.all('SELECT id_usuario FROM usuarios WHERE mail=?',mail,(err,resultados)=>{
-      //if(usuario_o_mail===resultados.usuario || usuario_o_mail===resultados.mail);
-      console.log("Los mail son "+resultados);
-      unUsuario= resultados;
-  });
-});
-}
-
-return unUsuario;
-
-}
+var unUsuarioX="as"; 
 comprobarCuentaIngreso("admin",undefined,"sadasd");
+console.log("un usuario X "+unUsuarioX);
+
+function comprobarCuentaIngreso(usuario,mail, password) {
+  let unUsuario;
+    if(typeof mail==='undefined'){
+      db.serialize(function(){
+          db.all('SELECT id_usuario,usuario,password from usuarios',(err,resultados)=>{
+        console.log("json "+JSON.stringify(resultados));
+        unUsuarioX= JSON.stringify(resultados);
+       // unUsuario=unUsuarioX.map(usuarios=> usuario===1);
+        console.log("un usuario es "+unUsuarioX);
+       // unUsuario=unUsuarioX.filter(esIgual)
+          });
+      });
+    }
+    else{
+        db.serialize(function(){
+            db.all('SELECT id_usuario FROM usuarios WHERE mail=?',mail,(err,resultados)=>{
+              unUsuarioX= resultados;
+          });
+        });
+    }
+}
+function esIgual(){
+
+}
+
 function selectpedidos(){
   db.serialize(function() {
     db.all('select * from pedidos',(err,resultados)=>{
