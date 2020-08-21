@@ -7,7 +7,7 @@ const database=require('./DB/db');
 const db=new sqlite.Database('./delilah.sqlite',(err)=>console.log(err));
 const is_admin=1,not_admin=0;
 var id_usuario=5,id_pedido=10,id_carrito=20,id_plato=51;
-var usuario_activo =-1;//si esta en este valor -1 significa que no hay uno activo
+var usuario_activo =0;//si esta en este valor -1 significa que no hay uno activo
 const api = express();
 api.use(bodyParser.json());
 //api.use(bodyParser.urlencoded({extended:false}));
@@ -32,17 +32,38 @@ function inicializarDB(){
 
           db.all('INSERT INTO platos VALUES (50,"pizza","300",2,"https://www.delonghi.com/Global/recipes/multifry/pizza_fresca.jpg")');
 
-          db.all('select * from usuarios',(err,resultados)=>{
-             console.log(resultados);
-         });
+         /* db.all('select * from usuarios',(err,resultados)=>{
+             console.log(resultados[0].id_usuario);
+         });*/
          
       
 });
 }
 inicializarDB();
+
+function verifyToken(req, res, next) {
+  // Get auth header value
+  const bearerHeader = req.headers['authorization'];
+  // Check if bearer is undefined
+  if(typeof bearerHeader !== 'undefined') {
+    // Split at the space
+    const bearer = bearerHeader.split(' ');
+    // Get token from array
+    const bearerToken = bearer[1];
+    // Set the token
+    req.token = bearerToken;
+    // Next middleware
+    next();
+  } else {
+    // Forbidden
+    res.sendStatus(403);
+  }
+
+}
+
 api.listen(3000, (req,res) => {
-    console.log('Servidor Delilah resto activo...');
-   // res.json(req);
+  let fecha=new Date();
+    console.log(fecha+ ' : Servidor Delilah resto activo...');
 });
 
 api.post('/usuarios', (req, res, next) => {
@@ -70,7 +91,7 @@ api.post('/usuarios', (req, res, next) => {
 });
 
 api.get('/usuarios', (req, res, next) => {
-if(!usuario_activo && esAdmin(usuario_activo)){
+if(usuario_activo && esAdmin(usuario_activo)){
   db.serialize(function() {
     db.all('SELECT * from usuarios', (err, resultados) => {
         console.log(resultados);
@@ -86,18 +107,23 @@ else{
 }
 });
 
-api.get('/login', (req, res,next) => {
+api.post('/login', (req, res) => {
   //console.log(req);
-  const { usuario, password } = req.body;
-  console.log("usuario "+ usuario);
-  const usuarioEncontrado = comprobarCuentaIngreso(usuario, password);
+  const { usuario,mail, password } = req.body;
+
+  const usuarioEncontrado = comprobarCuentaIngreso(usuario, mail,password);
   if (!usuarioEncontrado) {
       res.send(utils.mensajeServer.statusErrorClienteMensaje);
       res.status(utils.estadoDeServer.statusErrorCliente);
   }
+  jwt.sign({user},utils.clavesecreta, { expiresIn: '1h' }, (err, token) => {
+    res.json({
+      token
+    });
+  });
   res.status(utils.mensajeServer.statusOkMensaje);
   res.status(utils.estadoDeServer.statusOk);
-  usuario_activo(usuario);
+  usuario_activo(usuarioEncontrado);
 });
 
 
@@ -128,6 +154,7 @@ api.post('/pedidos', (req, res, next) => {
   const { t_pago, id_usuario, domicilio, total, carrito } = req.body;
   console.log(t_pago, id_usuario, domicilio, total, carrito);
   var fecha = new Date();
+  //fecha.toLocateTimeString();
   // pedidos (id_pedido INT,t_pago VARCHAR,estado_pedido VARCHAR,date ,total ,id_user INT ,id_carrito )'); 
   try {
       db.serialize(function() {
@@ -137,7 +164,7 @@ api.post('/pedidos', (req, res, next) => {
         });
         selectCarritos();
         selectpedidos();
-      res.status(utils.mensajeServer.statusOkConsulta);
+      res.send(utils.mensajeServer.statusOkConsulta);
       res.status(utils.estadoDeServer.statusOk);
       next();
   } catch (error) {
@@ -157,7 +184,21 @@ api.post('/carritos', (req, res, next) => {
   });
   });
   selectCarritos();
-})
+});
+api.post('/api/posts', verifyToken, (req, res) => {  
+  jwt.verify(req.token, 'secretkey', (err, authData) => {
+    if(err) {
+      res.sendStatus(403);
+    } else {
+      res.json({
+        message: 'Post created...',
+        authData
+      });
+    }
+  });
+});
+
+
 function cargarCarrito(unCarrito) {
   for (let i = 0; i < unCarrito.length; i++) {
       db.serialize(function() {
@@ -170,18 +211,35 @@ function cargarCarrito(unCarrito) {
         });
   }
 }
-function comprobarCuentaIngreso(usuario_o_mail, password) {
+  //if(typeof mail==='undefined') con esto compruebo cual ingreso
+  //en caso de que no exista retornar 0 
+function comprobarCuentaIngreso(usuario,mail, password) {
+let unUsuario=0; 
+if(typeof mail==='undefined'){
   db.serialize(function(){
-    db.run('SELECT * FROM usuarios WHERE mail=?',usuario_o_mail,(err,resultados)=>{
-      //if(usuario_o_mail===resultados.usuario || usuario_o_mail===resultados.mail);
-      console.log("Los resultados son "+resultados);
-      console.log(err);
-      return true;
-      //console.log(err);
+    
+      db.all('SELECT id_usuario FROM usuarios WHERE usuario=?',usuario,(err,resultados)=>{
+        //if(usuario_o_mail===resultados.usuario || usuario_o_mail===resultados.mail);
+        console.log("Los usuario son "+resultados);
+        console.log(err);
+        unUsuario= resultados;
+    });
   });
-  })
+}
+else{
+  db.serialize(function(){
+    db.all('SELECT id_usuario FROM usuarios WHERE mail=?',mail,(err,resultados)=>{
+      //if(usuario_o_mail===resultados.usuario || usuario_o_mail===resultados.mail);
+      console.log("Los mail son "+resultados);
+      unUsuario= resultados;
+  });
+});
+}
+
+return unUsuario;
 
 }
+comprobarCuentaIngreso("admin",undefined,"sadasd");
 function selectpedidos(){
   db.serialize(function() {
     db.all('select * from pedidos',(err,resultados)=>{

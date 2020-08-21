@@ -1,3 +1,4 @@
+const clavesecreta='delilah';
 const statusOk = 200,
     statusOkValidacion=201,
     statusOkPedido=203,
@@ -66,4 +67,4 @@ let pedidos=[{
 //utils.mensajeServer.
 //utils.estadoPedidos.
 //utils.estadoDeServer
-module.exports = { estadoDeServer,estadoPedidos,mensajeServer,tPagos};
+module.exports = { estadoDeServer,estadoPedidos,mensajeServer,tPagos,clavesecreta};
