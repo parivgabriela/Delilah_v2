@@ -4,9 +4,9 @@ const jwt = require('jsonwebtoken');
 const utils = require('./utils');
 const sqlite = require('sqlite3');
 const database = require('./DB/db');
+const util = require('util');
 const db = new sqlite.Database('./delilah.sqlite', (err) => console.log(err));
-const is_admin = 1,
-    not_admin = 0;
+const is_admin = 0;
 var id_usuario = 5,
     id_pedido = 10,
     id_carrito = 20,
@@ -109,23 +109,16 @@ api.get('/usuarios', (req, res, next) => {
     }
 });
 
-api.post('/login', comprobarCuentaIngreso, (req, res) => {
+api.post('/login',comprobarCuentaIngreso, (req, res) => {
     //console.log(req);
-    const { usuario, mail, password } = req.body;
 
-    const usuarioEncontrado = comprobarCuentaIngreso(usuario, mail, password);
-    if (!usuarioEncontrado) {
-        res.send(utils.mensajeServer.statusErrorClienteMensaje);
-        res.status(utils.estadoDeServer.statusErrorCliente);
-    }
-    jwt.sign({ user }, utils.clavesecreta, { expiresIn: '1h' }, (err, token) => {
+    jwt.sign({ id_usuario }, utils.clavesecreta, { expiresIn: '1h' }, (err, token) => {
         res.json({
             token
         });
     });
     res.status(utils.mensajeServer.statusOkMensaje);
     res.status(utils.estadoDeServer.statusOk);
-    usuarioActivo(usuarioEncontrado);
 });
 
 
@@ -214,39 +207,73 @@ function cargarCarrito(unCarrito) {
 }
 //if(typeof mail==='undefined') con esto compruebo cual ingreso
 //en caso de que no exista retornar 0 
-//comprobarCuentaIngreso("admin", undefined, "sadasd");
 //middleware
-function comprobarCuentaIngreso(usuario, mail, password, next) {
-    let unUsuario, unUsuarioX;
+function comprobarCuentaIngreso(req,res,next) {
+  /*
+  const { usuario, mail, password } = req.query;
+  console.log(usuario);
     if (typeof mail === 'undefined') {
         db.serialize(function() {
-            db.all('SELECT id_usuario,usuario,password from usuarios where usuario=?', usuario, (err, resultados) => {
-                unUsuarioX = JSON.stringify(resultados);
-                unUsuario = JSON.parse(unUsuarioX);
-                if (esIgual(unUsuarioX, password)) {
-                    // console.log("ingreso exitoso " + password);
-                    next();
+            db.all('SELECT id_usuario,usuario,password,is_admin from usuarios where usuario=?', usuario, (err, resultados) => {
+               if(resultados[0].password===password){
+                console.log("ingreso exitoso");
+                usuario_activo=resultados[0].id_usuario;
+                if(resultados[0].is_admin)
+                {
+                  is_admin=1;
                 }
+                res.send(utils.mensajeServer.statusOkConsulta);
+                res.status(utils.estadoDeServer.statusOk);
+                next();
+               }else{
+                res.send(utils.mensajeServer.statusErrorClienteMensaje);
+                res.status(utils.estadoDeServer.statusErrorCliente);
+               }               
             });
         });
     } else {
         db.serialize(function() {
-            db.all('SELECT id_usuario,usuario,password FROM usuarios WHERE mail=?', mail, (err, resultados) => {
-                unUsuarioX = JSON.stringify(resultados);
-                unUsuario = JSON.parse(unUsuarioX);
-                if (esIgual(unUsuarioX, password)) {
-                    console.log("ingreso exitoso " + password);
-                }
+            db.all('SELECT id_usuario,usuario,password,is_admin FROM usuarios WHERE mail=?', mail, (err, resultados) => {
+              
+               if(resultados[0].password===password){
+                console.log("ingreso exitoso");
+                usuario_activo=resultados[0].id_usuario;
+                  if(resultados[0].is_admin)
+                  {
+                    is_admin=1;
+                  }
+                res.send(utils.mensajeServer.statusOkConsulta);
+                res.status(utils.estadoDeServer.statusOk);
+                next();
+               }else{
+                res.send(utils.mensajeServer.statusErrorClienteMensaje);
+                res.status(utils.estadoDeServer.statusErrorCliente);
+               }
+           
             });
         });
     }
+    */
+   console.log("accediste");
+   next();
 }
 
 function esIgual(unparametro, unaPassword) {
     console.log("el resultado del select where es " + unparametro);
-    console.log("el json parser es " + JSON.parse(unparametro));
+    //var otroparametro = JSON.parse(unparametro);
+
+    /*
     var otroparametro = JSON.parse(unparametro);
-    console.log("en password es" + otroparametro[0].password);
+    console.log("en password es " + otroparametro[0].password+ " la otra pass "+unaPassword);
+    let otravariable=util.inspect(unparametro);
+    */
+console.log(unparametro['is_usuario']);
+    if(unparametro['password'] === unaPassword){
+      console.log("comparo las  contraseñas");
+    }else{
+      console.log("no   comparo las  contraseñas "+unparametro['password']);
+    }
+    
     return unparametro[0].password === unaPassword;
 }
 
@@ -274,22 +301,14 @@ function selectCarritos() {
 }
 cargarCarrito();
 //middleware
-function esAdmin(idUsuario) {
-    let unUsuario, unUsuarioX;
-    //revisar tokens para verificar ese tema
-    db.serialize(function() {
-        db.all('select id_usuario,is_admin from usuarios where id_usuario=?', idUsuario, (err, resultados) => {
-            unUsuarioX = JSON.stringify(resultados);
-            unUsuario = JSON.parse(unUsuarioX);
-            //[{"id_usuario":1,"is_admin":1}]
-            const { id_usuario, is_admin } = unUsuarioX.query;
-            //separar porque el res es 
-            console.log(id_usuario + " " + is_admin);
-            console.log("un usuario" + unUsuario[0] + " un usario X " + unUsuarioX);
-        });
-    });
+function esAdmin(idUsuario,es_admin) {
+   if(es_admin)
+   {
+     is_admin=idUsuario;
+     console.log("es admin");
+   }
+  
 }
-esAdmin(1);
 
 
 function usuarioActivo(usuario) {
