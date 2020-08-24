@@ -10,6 +10,7 @@ const statusOk = 200,
     statusOkValidacionMensaje="Usuario verificado",
     statusOkPedidoMensaje="Pedido ingresado exitosamente",
     statusOkConsulta="Su consulta fue realizada exitosamente",
+    statusOkActualizacion="La actualización fue realizada exitosamente",
     statusErrorClienteMensaje ='Datos incorrectos',//bad request
     statusErrorCredencialesMensaje='Credencial inválida, no puede ingresar',//Unauthorized
     statusNotFoundMensaje='status not found',
@@ -32,6 +33,7 @@ const estadoDeServer={
         statusOkValidacionMensaje,
         statusOkPedidoMensaje,
         statusOkConsulta,
+        statusOkActualizacion,
         statusErrorClienteMensaje,
         statusErrorCredencialesMensaje,
         statusNotFoundMensaje, 
