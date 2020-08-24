@@ -6,7 +6,7 @@ const sqlite = require('sqlite3');
 const database = require('./DB/db');
 const util = require('util');
 const db = new sqlite.Database('./delilah.sqlite', (err) => console.log(err));
-const is_admin = 0;
+var is_admin = 0;
 var id_usuario = 5,
     id_pedido = 10,
     id_carrito = 20,
@@ -93,32 +93,97 @@ api.post('/usuarios', (req, res, next) => {
 
 });
 
-api.get('/usuarios', (req, res, next) => {
-    if (usuario_activo && esAdmin(usuario_activo)) {
+api.get('/usuarios', (req, res) => {
+    if (usuario_activo && is_admin) {
+        console.log("ingreso de admin");
         db.serialize(function() {
             db.all('SELECT * from usuarios', (err, resultados) => {
                 console.log(resultados);
             });
         });
+        res.send(utils.mensajeServer.statusOkConsulta);
+        res.status(utils.estadoDeServer.statusOk);
+       // next();
     } else {
-        db.serialize(function() {
-            db.all('SELECT * from usuarios where id=?', usuario_activo, (err, resultados) => {
-                console.log(resultados);
+        if(usuario_activo){
+        console.log("ingreso de usuario");
+
+            db.serialize(function() {
+                db.all('SELECT * from usuarios where id=?', usuario_activo, (err, resultados) => {
+                    console.log(resultados);
+                });
             });
-        });
+            res.send(utils.mensajeServer.statusOkConsulta);
+        res.status(utils.estadoDeServer.statusOk);
+        //next();
+        }
+        else{
+        console.log("ingreso de intruso "+utils.mensajeServer.statusNotFoundMensaje);
+            res.send(utils.mensajeServer.statusNotFoundMensaje);
+        res.status(utils.estadoDeServer.statusOk);
+        }
+       
     }
 });
 
-api.post('/login',comprobarCuentaIngreso, (req, res) => {
+api.post('/login', (req, res) => {
     //console.log(req);
+  const { usuario, mail, password } = req.body;
+//console.log("usuario "+ usuario+ " mail "+ mail+ " password "+ password);
 
-    jwt.sign({ id_usuario }, utils.clavesecreta, { expiresIn: '1h' }, (err, token) => {
-        res.json({
-            token
+    if (typeof mail === 'undefined') {
+        db.serialize(function() {   
+            db.all('SELECT id_usuario,usuario,password,is_admin from usuarios where usuario=?', usuario, (err, resultados) => {
+              
+                if(resultados[0].password===password && (!err)){
+                console.log("ingreso exitoso");
+                usuario_activo=resultados[0].id_usuario;
+                if(resultados[0].is_admin)
+                {
+                console.log("usuario "+ usuario+  "admin"+ resultados[0].is_admin);
+
+                  is_admin=1;
+                  const token=jwt.sign({usuario_activo},utils.clavesecreta);
+                    res.header('autj-token',token).send(token);
+                
+                }
+              // res.send(utils.mensajeServer.statusOkConsulta);
+                res.status(utils.estadoDeServer.statusOk);
+               }else{
+                res.send(utils.mensajeServer.statusErrorClienteMensaje);
+                res.status(utils.estadoDeServer.statusErrorCliente);
+               }               
+            });
         });
-    });
-    res.status(utils.mensajeServer.statusOkMensaje);
-    res.status(utils.estadoDeServer.statusOk);
+    } else {
+        db.serialize(function() {
+            db.all('SELECT id_usuario,usuario,password,is_admin FROM usuarios WHERE mail=?', mail, (err, resultados) => {
+              
+               if(resultados[0].password===password){
+                console.log("ingreso exitoso");
+                usuario_activo=resultados[0].id_usuario;
+                  if(resultados[0].is_admin)
+                  {
+                    is_admin=1;
+                    jwt.sign({ usuario_activo }, utils.clavesecreta, { expiresIn: '1h' }, (err, token) => {
+                        res.json({
+                            token
+                        });
+                    });
+                  }
+                res.send(utils.mensajeServer.statusOkConsulta);
+                res.status(utils.estadoDeServer.statusOk);
+                next();
+               }else{
+                res.send(utils.mensajeServer.statusErrorClienteMensaje);
+                res.status(utils.estadoDeServer.statusErrorCliente);
+               }
+           
+            });
+        });
+    }
+
+
 });
 
 
@@ -209,9 +274,11 @@ function cargarCarrito(unCarrito) {
 //en caso de que no exista retornar 0 
 //middleware
 function comprobarCuentaIngreso(req,res,next) {
-  /*
+  
   const { usuario, mail, password } = req.query;
+
   console.log(usuario);
+  /*
     if (typeof mail === 'undefined') {
         db.serialize(function() {
             db.all('SELECT id_usuario,usuario,password,is_admin from usuarios where usuario=?', usuario, (err, resultados) => {
@@ -301,14 +368,7 @@ function selectCarritos() {
 }
 cargarCarrito();
 //middleware
-function esAdmin(idUsuario,es_admin) {
-   if(es_admin)
-   {
-     is_admin=idUsuario;
-     console.log("es admin");
-   }
-  
-}
+
 
 
 function usuarioActivo(usuario) {
