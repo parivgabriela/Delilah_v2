@@ -10,8 +10,11 @@ const statusOk = 200,
     statusOkValidacionMensaje="Usuario verificado",
     statusOkPedidoMensaje="Pedido ingresado exitosamente",
     statusOkConsulta="Su consulta fue realizada exitosamente",
+    statusUsuarioNuevoOk="El usuario fue creado correctamente",
     statusOkActualizacion="La actualización fue realizada exitosamente",
     statusErrorClienteMensaje ='Datos incorrectos',//bad request
+    statusPrevioLogueo="Debe haber iniciado sesión previamente",
+    statusDeleteOk="Se elimino correctamente",
     statusErrorCredencialesMensaje='Credencial inválida, no puede ingresar',//Unauthorized
     statusNotFoundMensaje='status not found',
     statusErrorServidorMensaje='Internal Server Error',//Internal Server Error
@@ -33,8 +36,11 @@ const estadoDeServer={
         statusOkValidacionMensaje,
         statusOkPedidoMensaje,
         statusOkConsulta,
+        statusUsuarioNuevoOk,
         statusOkActualizacion,
         statusErrorClienteMensaje,
+        statusPrevioLogueo,
+        statusDeleteOk,
         statusErrorCredencialesMensaje,
         statusNotFoundMensaje, 
         statusErrorServidorMensaje,

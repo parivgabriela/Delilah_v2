@@ -14,6 +14,7 @@ var id_usuario = 5,
     id_carrito = 20,
     id_plato = 51;
 var usuario_activo = 0; 
+const not_admin=0;
 const api = express();
 api.use(bodyParser.json());
 
@@ -58,126 +59,149 @@ api.listen(3000, (req, res) => {
     console.log(fecha + ' : Servidor Delilah resto activo...');
 });
 
-api.post('/usuarios', (req, res, next) => {
+api.post('/usuarios', (req, res) => {
     const { usuario, nombre_apellido, mail, telefono, domicilio, password } = req.body;
-    console.log(usuario, nombre_apellido, mail, telefono, domicilio, password);
-    try {
-        //rever que onda con los inser cuando se reemplaza, pero viene por aqui la cosa
-        db.serialize(function() {
-            db.run("INSERT INTO usuarios VALUES (?,?,?,?,?,?,?,?)", id_usuario, usuario, nombre_apellido, mail, telefono, domicilio, password, not_admin);
-            id_usuario++;
-            db.all('select * from usuarios', (err, resultados) => {
-                console.log(resultados);
+    
+            db.all("INSERT INTO usuarios VALUES (?,?,?,?,?,?,?,?)", id_usuario, usuario, nombre_apellido, mail, telefono, domicilio, password, not_admin,(err,resultados)=>{
+                id_usuario++;
+                res.status(utils.estadoDeServer.statusOk);
+                res.send(utils.mensajeServer.statusUsuarioNuevoOk);
+                if(err){
+                    console.log(err);
+                    console.log(utils.estadoDeServer.statusErrorCliente);
+                    res.status(utils.estadoDeServer.statusErrorServidor);
+                    res.send(utils.mensajeServer.statusErrorServidorMensaje);
+                    next(new Error(error));
+                }
             });
-        });
-        res.status(utils.mensajeServer.statusOkCreacionUsuarioMensaje);
-        res.status(utils.estadoDeServer.statusOk);
-        next();
-    } catch (error) {
-        console.log(error);
-        console.log(utils.estadoDeServer.statusErrorCliente);
-        next(new Error(error));
-    }
-
 });
 
 api.get('/usuarios', (req, res) => {
     if (usuario_activo && is_admin) {
-        console.log("ingreso de admin");
-        db.serialize(function() {
-            db.all('SELECT * from usuarios', (err, resultados) => {
-                console.log(resultados);
+        let unUsuario;
+        console.log("Consulta de admin");
+            db.all('SELECT usuario,nombre_apellido,mail,telefono,domicilio from usuarios', (err, resultados) => {
+            console.log("admin res"+resultados);
+            res.status(utils.estadoDeServer.statusOk).send(resultados);
             });
-        });
-        res.send(utils.mensajeServer.statusOkConsulta);
-        res.status(utils.estadoDeServer.statusOk);
     } else {
         if(usuario_activo){
-        console.log("ingreso de usuario");
-
-            db.serialize(function() {
-                db.all('SELECT * from usuarios where id=?', usuario_activo, (err, resultados) => {
-                    console.log(resultados);
-                });
+            db.all('SELECT usuario,nombre_apellido,mail,telefono,domicilio from usuarios where id_usuario=?',usuario_activo, (err, resultados) => {
+                res.status(utils.estadoDeServer.statusOk).send(resultados);
             });
-            res.send(utils.mensajeServer.statusOkConsulta);
-        res.status(utils.estadoDeServer.statusOk);
         }
         else{
-        console.log("ingreso de intruso "+utils.mensajeServer.statusNotFoundMensaje);
-            res.send(utils.mensajeServer.statusNotFoundMensaje);
-        res.status(utils.estadoDeServer.statusOk);
+            console.log("ingreso de intruso "+utils.mensajeServer.statusNotFoundMensaje);
+            res.status(utils.estadoDeServer.statusErrorCredenciales);
+            res.send(utils.mensajeServer.statusPrevioLogueo);
         }
-       
     }
 });
 
 api.post('/login', (req, res) => {
-    //console.log(req);
   const { usuario, mail, password } = req.body;
-//console.log("usuario "+ usuario+ " mail "+ mail+ " password "+ password);
-
+console.log(password);
     if (typeof mail === 'undefined') {
-        db.serialize(function() {   
             db.all('SELECT id_usuario,usuario,password,is_admin from usuarios where usuario=?', usuario, (err, resultados) => {
-              
+              if(resultados.length>0){
                 if(resultados[0].password===password && (!err)){
-                console.log("ingreso exitoso");
-                usuario_activo=resultados[0].id_usuario;
-                if(resultados[0].is_admin)
-                {
-                    is_admin=1;
-                    const token=jwt.sign({usuario_activo},utils.clavesecreta);
-                    res.header('auth-token',token).send(token);
-                }
-              // res.send(utils.mensajeServer.statusOkConsulta);
-                res.status(utils.estadoDeServer.statusOk);
-               }else{
-                res.send(utils.mensajeServer.statusErrorClienteMensaje);
+                    console.log("ingreso exitoso");
+                    usuario_activo=resultados[0].id_usuario;
+                    if(resultados[0].is_admin)
+                    {
+                        is_admin=1;
+                        const token=jwt.sign({usuario_activo},utils.clavesecreta);
+                        res.header('auth-token',token).send(token);
+                        res.status(utils.estadoDeServer.statusOk);
+                    }else{
+                        res.status(utils.estadoDeServer.statusOk);
+                        res.send(utils.mensajeServer.statusOkMensaje);
+                    }
+                   }else{
+                    res.status(utils.estadoDeServer.statusErrorCliente);
+                    res.send(utils.mensajeServer.statusErrorClienteMensaje);
+                   }  
+              }else{
                 res.status(utils.estadoDeServer.statusErrorCliente);
-               }               
+                res.send(utils.mensajeServer.statusErrorClienteMensaje);
+              }
+                             
             });
-        });
+        
     } else {
-        db.serialize(function() {
+       
             db.all('SELECT id_usuario,usuario,password,is_admin FROM usuarios WHERE mail=?', mail, (err, resultados) => {
-              
-               if(resultados[0].password===password){
-                console.log("ingreso exitoso");
-                usuario_activo=resultados[0].id_usuario;
-                if(resultados[0].is_admin)
-                {
-                    is_admin=1;
-                    const token=jwt.sign({usuario_activo},utils.clavesecreta);
-                    res.header('auth-token',token).send(token);
-                }
-                res.send(utils.mensajeServer.statusOkConsulta);
-                res.status(utils.estadoDeServer.statusOk);
-                next();
-               }else{
-                res.send(utils.mensajeServer.statusErrorClienteMensaje);
-                res.status(utils.estadoDeServer.statusErrorCliente);
-               }
-           
+                if(resultados.length>0){
+                    if(resultados[0].password===password && (!err)){
+                        console.log("ingreso exitoso");
+                        usuario_activo=resultados[0].id_usuario;
+                        if(resultados[0].is_admin)
+                    {
+                        is_admin=1;
+                        const token=jwt.sign({usuario_activo},utils.clavesecreta);
+                        res.header('auth-token',token).send(token);
+                        res.status(utils.estadoDeServer.statusOk);
+                    }else{
+                        res.status(utils.estadoDeServer.statusOk);
+                        res.send(utils.mensajeServer.statusOkMensaje);
+                    }
+                       }else{
+                        res.status(utils.estadoDeServer.statusErrorCliente);
+                        res.send(utils.mensajeServer.statusErrorClienteMensaje);
+                       }  
+                  }else{
+                    res.status(utils.estadoDeServer.statusErrorCliente);
+                    res.send(utils.mensajeServer.statusErrorClienteMensaje);
+                  }
             });
-        });
     }
-
 });
 
 
 api.get('/platos', (req, res, next) => {
-    db.serialize(function() {
-        db.all('SELECT * from platos', (err, resultados) => {
-            console.log(resultados);
+        db.all('SELECT nombre_plato,precio,stock,url_plato from platos', (err, resultados) => {
+            let unPlato;
+            console.log(utils.mensajeServer.statusOkConsulta);   
+            unPlato=JSON.stringify(resultados);
+            res.status(utils.estadoDeServer.statusOk).send(JSON.parse(unPlato));
         });
-    });
-    res.send(utils.mensajeServer.statusOkConsulta);
-    res.status(utils.estadoDeServer.statusOk);
+    
 });
 
-//agregar modificacion de admin
-api.post('/platos',verifyToken, (req, res, next) => {
+
+
+api.post('/pedidos', (req, res) => {
+    //verificar que el usuario este activo--> se haya logueado
+    const { t_pago, id_usuario, domicilio, total, carrito } = req.body;
+    var fecha = new Date();
+    if(usuario_activo){
+        db.serialize(function() {
+            db.all('INSERT INTO pedidos VALUES (?,?,?,?,?,?,?)', id_pedido, t_pago, utils.estadoPedidos.pedidoNuevo, fecha, total, id_usuario, id_carrito);
+            db.all('INSERT INTO carritos VALUES (?,?,?,?)', id_carrito, id_pedido, carrito[0].id_plato, carrito[0].cantidad);
+            id_carrito++;
+            console.log(utils.mensajeServer.statusOkPedidoMensaje)
+            res.status(utils.estadoDeServer.statusOk);
+            res.send(utils.mensajeServer.statusOkPedidoMensaje);
+        });
+    }else{
+        console.log(error);
+        console.log(utils.estadoDeServer.statusErrorCliente);
+    }    
+
+});
+api.delete('/pedidos/:id_pedidos', verifyToken, (req, res) => {
+    let un_id_plato = req.params.id_plato;
+    if(is_admin){
+        db.all('DELETE pedidos WHERE id_pedido=?',un_id_plato, (err, resultados) => {
+            res.status(utils.estadoDeServer.statusOk);
+            res.send(utils.mensajeServer.statusDeleteOk);
+        });
+    }else{
+        res.status(utils.estadoDeServer.statusErrorCredenciales).send(utils.mensajeServer.statusErrorCredencialesMensaje);
+    }
+       
+});
+api.post('/platos',verifyToken, (req, res) => {
     const { nombre_plato, precio, url_plato, stock } = req.body;
     if(is_admin){
         db.serialize(function() {
@@ -190,29 +214,6 @@ api.post('/platos',verifyToken, (req, res, next) => {
         res.status(utils.estadoDeServer.statusErrorCredenciales).send(utils.mensajeServer.statusErrorCredencialesMensaje);
     }
 });
-
-api.post('/pedidos',verifyToken, (req, res, next) => {
-    //verificar que el usuario este activo--> se haya logueado
-    const { t_pago, id_usuario, domicilio, total, carrito } = req.body;
-    console.log(t_pago, id_usuario, domicilio, total, carrito);
-    var fecha = new Date();
-    try {
-        db.serialize(function() {
-            db.all('INSERT INTO pedidos VALUES (?,?,?,?,?,?,?)', id_pedido, t_pago, utils.estadoPedidos.pedidoNuevo, fecha, total, id_usuario, id_carrito);
-            db.all('INSERT INTO carritos VALUES (?,?,?,?)', id_carrito, id_pedido, carrito[0].id_plato, carrito[0].cantidad);
-            id_carrito++;
-        });
-        res.send(utils.mensajeServer.statusOkConsulta);
-        res.status(utils.estadoDeServer.statusOk);
-        next();
-    } catch (error) {
-        console.log(error);
-        console.log(utils.estadoDeServer.statusErrorCliente);
-        next(new Error(error));
-    }
-
-});
-
 api.get('/platos/:id_plato', verifyToken, (req, res) => {
     let un_id_plato = req.params.id_plato;
     let un_plato;
@@ -242,18 +243,19 @@ api.put('/platos/:id_plato', verifyToken, (req, res) => {
     }
        
 });
-api.delete('/pedidos/:id_pedidos', verifyToken, (req, res) => {
+api.delete('/platos/:id_plato', verifyToken, (req, res) => {
     let un_id_plato = req.params.id_plato;
     if(is_admin){
-        db.all('DELETE platos WHERE id_pedido=?',un_id_plato, (err, resultados) => {
+        db.all('DELETE platos WHERE id_plato=? WHERE id_plato=?',un_id_plato, (err, resultados) => {
             //un_plato=JSON.stringify(resultados[0]);
             res.status(utils.estadoDeServer.statusOk);
-            res.send(utils.mensajeServer.statusDeleteOk);
+            res.send(utils.mensajeServer.statusOkActualizacion);
         });
     }else{
         res.status(utils.estadoDeServer.statusErrorCredenciales).send(utils.mensajeServer.statusErrorCredencialesMensaje);
     }
        
 });
+
 
 
