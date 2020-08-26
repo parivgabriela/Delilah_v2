@@ -1,0 +1,92 @@
+swagger: "2.0"
+info:
+  description: "API para administrar pedidos. Te permite actuar desde dos roles, siendo un cliente puede consultar sobre los platos, sus pedidos e información personal. </br> En el rol de adminstrador puede crear nuevo platos, cambiar el stock, eliminar pedidos consultar todos los usuarios"
+  version: "1.0.0"
+  title: "Delilah Resto API"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "apiteam@swagger.io"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "petstore.swagger.io"
+basePath: "/v2"
+tags:
+- name: "Delilah"
+  description: "Administrador de pedidos"
+schemes:
+- "https"
+- "http"
+paths:
+  /usuarios:
+    post:
+      tags:
+      - "usuarios"
+      summary: "Creación de un nuevo usuario"
+      description: ""
+      operationId: "addPet"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Objeto de un usuario que va ser añadido"
+        required: true
+        schema:
+          $ref: "#/definitions/Usuario"
+      responses:
+        "200":
+          description: "El usuario fue creado correctamente"
+          # completar buscar como mostrar en didtintos roles/ si es agregando otro endpoint
+    get:
+      tags:
+      - "usuarios"
+      summary: "Consulta datos de un usuario si tiene rol cliente y muestra todos los usuarios si es rol administrador"
+      description: ""
+      operationId: "updatePet"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "Se creo el usuario"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Usuario"
+        "404":
+          description: "Pet not found"
+        "405":
+          description: "Validation exception"
+        
+definitions:
+  Usuario:
+    type: "object"
+    required:
+    - "name"
+    - "photoUrls"
+    properties:
+      usuario:
+       type: "string"
+       example: "Carla Cor"
+      nombre_apellido:
+        type: "string"
+        example: "doggie"
+      mail: 
+        type: "string"
+        example: "carla@gmail.com"  
+      password:
+        type: "string"
+        example: "123456"  
+        xml:
+          name: "photoUrl"
+          wrapped: true
+        items:
+          type: "string"
