@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Delilah Resto API</title>
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Source+Code+Pro:300,600|Titillium+Web:400,600,700" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.24.2/swagger-ui.css" >
+  <link rel="shortcut icon" type="image/png" href="favicon.png"/>
+  <style>
+    html
+    {
+      box-sizing: border-box;
+      overflow: -moz-scrollbars-vertical;
+      overflow-y: scroll;
+    }
+    *,
+    *:before,
+    *:after
+    {
+      box-sizing: inherit;
+    }
+
+    body {
+      margin:0;
+      background: #fafafa;
+    }
+
+  </style>
+  <!-- <style>
+    
+    .swagger-ui .info .title small pre {
+        padding: 1px;
+        background-color: #444;
+    }
+    .swagger-ui .info .title small {
+        font-size: 10px;
+        position: relative;
+        top: -5px;
+        display: inline-block;
+        margin: 0 0 0 5px;
+        padding: 4px;
+        vertical-align: super;
+        border-radius: 57px !important;
+        background: #89bf04 !important;
+    }
+    .swagger-ui .info .title small pre.version {
+        background-color: #89bf04;
+        border: 0px;
+      }
+    .swagger-ui pre.version {
+          padding: 0px;
+          max-width: 60px;
+          border: 0px;
+      }
+    .swagger-ui .info .title small pre {
+          padding:0px;
+      }
+    .swagger-ui .info .title small {
+          background-color: rgb(137, 191, 4);
+      }
+      .swagger-ui table th, .swagger-ui table td {
+          padding: 10px !important;
+      }
+      .swagger-ui table th {
+        color: white;
+        font-size:16px;
+    }
+    .swagger-ui .col_header {
+        color: white !important;
+    }
+    div#swagger-ui {
+        border: 1px solid #dedede;
+    }
+    .swagger-ui .info .title small pre {
+        padding: 1px;
+        background-color: #444;
+    }
+    .swagger-ui .info .title small {
+        font-size: 10px;
+        position: relative;
+        top: -5px;
+        display: inline-block;
+        margin: 0 0 0 5px;
+        padding: 4px;
+        vertical-align: super;
+        border-radius: 57px !important;
+        background: #89bf04 !important;
+    }
+    .swagger-ui .info .title small pre.version {
+        background-color: #89bf04;
+      }
+    .swagger-ui li.tabitem {
+        list-style: none !important;
+    }
+    .swagger-ui .response-col_description__inner p {
+      color: white;
+      font-style: normal;
+      font-size: 12px;
+    }
+    .swagger-ui pre.version {
+        padding: 0px;
+    }
+    .swagger-ui .info .title small pre {
+        padding:0px;
+    }
+    .swagger-ui .info .title small {
+        background-color: rgb(137, 191, 4);
+    }
+    .swagger-ui a.tablinks {
+        margin-right: 20px;
+    }
+    .swagger-ui td.col.response-col_status {
+        padding: 10px !important;
+    }
+    .swagger-ui .opblock .opblock-section-header h4 {
+      font-size: 18px !important;
+      font-weight: bold;
+      padding: 0px;
+    }
+    .swagger-ui td.col, .swagger-ui td.col.col_header.response-col_description {
+        padding: 10px;
+    }
+    .swagger-ui h4.opblock-title_normal {
+        font-size: 16px;
+        font-style: italic;
+    }
+    .swagger-ui h4.opblock-title_normal[id] {
+        padding-bottom: 15px;
+        font-style: italic;
+      }
+    .swagger-ui {
+      border: 1px solid #dedede;
+    }
+    .swagger-ui select {
+        font-weight: normal !important;
+        font-family: monospace;
+    }
+    .swagger-ui table {
+      table-layout: auto !important;
+    }
+    .swagger-ui .scheme-container {
+      padding: 0px 0px 15px 0px;
+    }
+    .swagger-ui .renderedMarkdown p {
+        font-size: 14px;
+    }
+    .swagger-ui tr.response p {
+      font-style: italic;
+    }
+    .swagger-ui table.model tbody tr td {
+      padding: 1em !important;
+    }
+    .response-content-type.controls-accept-header small code {
+        font-size: 12px;
+      }
+    .swagger-ui .opblock-summary-path a.nostyle {
+        font-family: monospace;
+    }
+    .swagger-ui .info {
+      /* margin: -25px 0px !important; */
+    }
+    .swagger-ui .main span.url {
+        display: none;
+    }
+    .swagger-ui span.opblock-summary-path a.nostyle {
+        font-family: Monospace !important;
+        size: 16px;
+    }
+    .swagger-ui .opblock-description-wrapper, .swagger-ui .opblock-external-docs-wrapper, .swagger-ui .opblock-title_normal {
+        padding: 15px 20px 5px 20px;
+    }
+    .swagger-ui h1[id], .swagger-ui h2[id], .swagger-ui h3[id], .swagger-ui h4[id], .swagger-ui h5[id] {
+        margin: 0px;
+        padding: 0px;
+    }
+    .swagger-ui pre {
+        font-family: Monaco, Monospace !important;
+        font-size: 11px;
+      }
+    h6, h6 code.highlighter-rouge {
+        font-size: 16px;
+    }
+    .swagger-ui .responses-inner h4, .swagger-ui .responses-inner h5 {
+      font-size: 16px;
+    }
+    .swagger-ui code {
+        font-size: 12px;
+    }
+    /* disable the try it out buttons
+    button.btn.try-out__btn {
+        display: none;
+    }
+    */
+    
+    </style> -->
+</head>
+<body>
+
+<div id="delilah"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.24.2/swagger-ui-bundle.js"> </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.24.2/swagger-ui-standalone-preset.js"> </script>
+
+<script>
+window.onload = async function() {
+  
+  var spec = {"openapi":"3.0.0","info":{"title":"Delilah Resto","version":"1.1.6","description":"Delilah Resto API se compone de endpoints preparados para una aplicación de pedidos, donde le permitiría a los usuarios registrarse, hacer su pedido de acuerdo a productos existentes, y enviarlo. También se brindarán endpoints para administradores, que podran ver los pedidos, actualizarlos, así como actualizar los productos, agregar nuevos, o eliminarlos","contact":{"name":"Ezequiel G. Holzweissig","url":"https://ezeholz.github.io","email":"ezequielgh1999@gmail.com"},"license":{"name": "Apache 2.0","url": "http://www.apache.org/licenses/LICENSE-2.0.html"}},"servers":[{"url":"http://localhost:8000","description":"Computadora Local"},{"url":"http://192.168.2.102:8000","description":"Testing IP"}],"tags":[{"name":"Pedidos","description":"Endpoint de pedidos"},{"name":"Productos","description":"Endpoint de productos"},{"name":"Usuarios","description":"Endpoint de acceso"}],"paths":{"/pedidos":{"get":{"tags":["Pedidos"],"summary":"Obtener todos los pedidos","security":[{"Auth":[]}],"responses":{"200":{"$ref":"#/components/responses/arrayPedido"},"401":{"$ref":"#/components/responses/401"},"403":{"$ref":"#/components/responses/403"},"404":{"$ref":"#/components/responses/404"}}},"post":{"tags":["Pedidos"],"summary":"Crear un pedido nuevo","requestBody":{"$ref":"#/components/requestBodies/Producto"},"security":[{"Auth":[]}],"responses":{"200":{"$ref":"#/components/responses/200"},"400":{"$ref":"#/components/responses/400"},"401":{"$ref":"#/components/responses/401"}}}},"/pedidos/{id}":{"get":{"tags":["Pedidos"],"summary":"Obtener pedido por ID","security":[{"Auth":[]}],"parameters":[{"name":"id","in":"path","description":"ID del pedido","required":true,"schema":{"type":"integer"}}],"responses":{"200":{"$ref":"#/components/responses/Pedido"},"401":{"$ref":"#/components/responses/401"},"403":{"$ref":"#/components/responses/403"},"404":{"$ref":"#/components/responses/404"}}},"put":{"tags":["Pedidos"],"summary":"Modificar un Pedido","parameters":[{"name":"id","in":"path","description":"ID del pedido","required":true,"schema":{"type":"integer"}}],"security":[{"Auth":[]}],"requestBody":{"$ref":"#/components/requestBodies/modPedidos"},"responses":{"200":{"$ref":"#/components/responses/Pedido"},"400":{"$ref":"#/components/responses/400"},"401":{"$ref":"#/components/responses/401"},"403":{"$ref":"#/components/responses/403"},"404":{"$ref":"#/components/responses/404"}}}},"/productos":{"get":{"tags":["Productos"],"summary":"Listar todos los productos","security":[{"Auth":[]}],"responses":{"200":{"$ref":"#/components/responses/arrayProducto"},"401":{"$ref":"#/components/responses/401"},"404":{"$ref":"#/components/responses/404"}}},"post":{"tags":["Productos"],"summary":"Generar un producto nuevo","requestBody":{"$ref":"#/components/requestBodies/Producto"},"security":[{"Auth":[]}],"responses":{"200":{"$ref":"#/components/responses/200"},"400":{"$ref":"#/components/responses/400"},"401":{"$ref":"#/components/responses/401"},"403":{"$ref":"#/components/responses/403"}}}},"/productos/{id}":{"get":{"tags":["Productos"],"summary":"Obtener un producto por ID","parameters":[{"name":"id","in":"path","description":"ID del producto","required":true,"schema":{"type":"integer"}}],"security":[{"Auth":[]}],"responses":{"200":{"$ref":"#/components/responses/Producto"},"401":{"$ref":"#/components/responses/401"},"404":{"$ref":"#/components/responses/404"}}},"put":{"tags":["Productos"],"summary":"Modificar un producto","parameters":[{"name":"id","in":"path","description":"ID del producto","required":true,"schema":{"type":"integer"}}],"security":[{"Auth":[]}],"requestBody":{"$ref":"#/components/requestBodies/Producto"},"responses":{"200":{"$ref":"#/components/responses/Producto"},"400":{"$ref":"#/components/responses/400"},"401":{"$ref":"#/components/responses/401"},"403":{"$ref":"#/components/responses/403"},"404":{"$ref":"#/components/responses/404"}}},"delete":{"tags":["Productos"],"summary":"Borrar producto","parameters":[{"name":"id","in":"path","description":"ID del producto","required":true,"schema":{"type":"integer"}}],"security":[{"Auth":[]}],"responses":{"200":{"$ref":"#/components/responses/200"},"401":{"$ref":"#/components/responses/401"},"403":{"$ref":"#/components/responses/403"},"404":{"$ref":"#/components/responses/404"}}}},"/usuarios":{"post":{"tags":["Usuarios"],"summary":"Crear un usuario","requestBody":{"$ref":"#/components/requestBodies/Usuario"},"responses":{"200":{"$ref":"#/components/responses/200"},"400":{"$ref":"#/components/responses/400"}}}},"/usuarios/login":{"get":{"tags":["Usuarios"],"summary":"Loguear al usuario","parameters":[{"name":"username","in":"header","description":"Usuario","required":true,"schema":{"type":"string"}},{"name":"password","in":"header","description":"Contraseña","required":true,"schema":{"type":"string","format":"password"}}],"responses":{"200":{"$ref":"#/components/responses/token"},"404":{"$ref":"#/components/responses/404"}}}},"/usuarios/logout":{"get":{"tags":["Usuarios"],"summary":"Desloguear al usuario","security":[{"Auth":[]}],"responses":{"200":{"$ref":"#/components/responses/200"},"401":{"$ref":"#/components/responses/401"}}}}},"components":{"responses":{"200":{"description":"```\nOK\n```\n"},"400":{"description":"```\nBad Request\n```\n"},"401":{"description":"```\nUnauthorized\n```\n"},"403":{"description":"```\nForbidden\n```\n"},"404":{"description":"```\nNot Found\n```\n"},"418":{"description":"```\nI'm a teapot\n```\n"},"Producto":{"description":"```\n{\n  \"nombre\": \"string\",\n  \"short\": \"string\",\n  \"img\": \"string\",\n  \"precio\": 0\n}\n```\n"},"arrayProducto":{"description":"```\n[\n  {\n    \"nombre\": \"string\",\n    \"short\": \"string\",\n    \"img\": \"string\",\n    \"precio\": 0\n  }, {...}\n]\n```\n"},"Pedido2":{"description":"```\n{\n  \"Cliente\": {\n    \"nombre\": \"string\",\n    \"direccion\": \"string\",\n    \"telefono\": 0\n  },\n  \"Productos\": [\n    {\n      \"Cantidad\": 0,\n      \"Producto\": {\n        \"nombre\": \"string\",\n        \"short\": \"string\",\n        \"img\": \"string\",\n        \"precio\": 0\n      }, {...}\n    }\n  ],\n  \"Hora\": \"16:42\",\n  \"Status\": 0,\n  \"Efectivo\": true\n}\n```\n"},"Pedido":{"description":"```\n{\n  \"status\": 0,\n  \"hora\": \"16:42\",\n  \"prod\": \"3,4,6,1,0,2\",\n  \"usuario\": 0,\n  \"pago\": true\n}\n```\n"},"arrayPedido2":{"description":"```\n[\n  {\n    \"Cliente\": {\n      \"nombre\": \"string\",\n      \"direccion\": \"string\",\n      \"telefono\": 0\n    },\n    \"Productos\": [\n      {\n        \"Cantidad\": 0,\n        \"Producto\": {\n          \"nombre\": \"string\",\n          \"short\": \"string\",\n          \"img\": \"string\",\n          \"precio\": 0\n        }\n      }, {...}\n    ],\n    \"Hora\": \"16:42\",\n    \"Status\": 0,\n    \"Efectivo\": true\n  }, {...}\n]\n```\n"},"arrayPedido":{"description":"```\n[\n  {\n    \"status\": 0,\n    \"hora\": \"16:42\",\n    \"prod\": \"3,4,6,1,0,2\",\n    \"usuario\": 0,\n    \"pago\": true\n  }, {...}\n]\n```\n"},"token":{"description":"","content":{"text/plain":{"schema":{"type":"string","example":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImV4YW1wbGUiLCJpYXQiOjE1ODY2NzczMzl9.Vtb7iWp3qBASmGb_vTY-TqzXKKEYin9g2Qt4U_EA0Uc"}},"application/json":{"schema":{"type":"object","properties":{"api_key":{"type":"string","example":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImV4YW1wbGUiLCJpYXQiOjE1ODY2NzczMzl9.Vtb7iWp3qBASmGb_vTY-TqzXKKEYin9g2Qt4U_EA0Uc"}}}}}}},"requestBodies":{"Producto":{"description":"","required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/Producto"}}}},"Usuario":{"description":"","required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/Usuario"}}}},"Nota":{"description":"","required":true,"content":{"application/json":{"schema":{"type":"object","properties":{"Productos":{"type":"array","items":{"$ref":"#/components/schemas/Producto"}},"Efectivo":{"type":"boolean","description":"Paga en efectivo"}}}}}},"basePedidos":{"required":true,"content":{"application/json":{"schema":{"type":"object","properties":{"prod":{"type":"string","description":"ID's de los productos pedidos","example":"3,4,6,1,0,2"},"pago":{"type":"boolean","description":"Paga en efectivo"}}}}}},"modPedidos":{"required":true,"content":{"application/json":{"schema":{"type":"object","properties":{"status":{"type":"integer"},"hora":{"type":"string","example":"16:42"},"prod":{"type":"string","description":"ID's de los productos pedidos","example":"3,4,6,1,0,2"},"usuario":{"type":"integer"},"pago":{"type":"boolean","description":"Paga en efectivo"}}}}}}},"schemas":{"Cliente":{"type":"object","properties":{"nombre":{"type":"string"},"direccion":{"type":"string"},"telefono":{"type":"integer","format":"int64"}}},"Producto":{"type":"object","properties":{"nombre":{"type":"string"},"short":{"type":"string"},"img":{"type":"string"},"precio":{"type":"integer","format":"int32"}}},"Pedidos":{"type":"object","properties":{"Cliente":{"$ref":"#/components/schemas/Cliente"},"Productos":{"type":"array","items":{"type":"object","properties":{"Cantidad":{"type":"integer","format":"int32"},"Producto":{"$ref":"#/components/schemas/Producto"}}}},"Hora":{"type":"string","example":"16:42"},"Status":{"type":"integer","format":"int32"},"Efectivo":{"type":"boolean"}}},"Usuario":{"type":"object","properties":{"username":{"type":"string"},"password":{"type":"string","format":"password"},"nombre":{"type":"string"},"correo":{"type":"string"},"telefono":{"type":"integer","format":"int64"},"dir":{"type":"string"}}}},"securitySchemes":{"Auth":{"type":"http","scheme":"bearer","bearerFormat":"JWT"}}}};
+  
+  try{
+    await fetch("https://ezeholz.github.io/Acamica/tercerProyecto/docs/spec.json").then(function(res){return res.json()}).then(function(res){
+        if(res.info.version>spec.info.version){spec = res}
+    })
+  } catch(err){console.log(err)}
+  
+  // Build a system
+  const ui = SwaggerUIBundle({
+    spec: spec,
+    dom_id: '#delilah',
+    deepLinking: true,
+    presets: [
+      SwaggerUIBundle.presets.apis,
+      SwaggerUIStandalonePreset
+    ],
+    plugins: [
+      SwaggerUIBundle.plugins.DownloadUrl
+    ],
+    layout: "StandaloneLayout"
+  })
+  
+  window.ui = ui
+
+  var elements = document.getElementsByClassName("download-url-wrapper");
+  while(elements.length > 0){
+    elements[0].parentNode.removeChild(elements[0]);
+  }
+  
+  document.addEventListener('click',function(){
+    setTimeout(function(){
+      let cambio = document.getElementsByClassName("response-controls")
+      for(let i=0;i<cambio.length;i++){
+        if(cambio[i].parentNode.lastChild != cambio[i])
+          cambio[i].parentNode.appendChild(cambio[i])
+      }
+      let place = document.getElementsByClassName("parameters-col_description")
+      try{for(let i=0;i<place.length;i++){
+        if(place[i].getElementsByTagName("input") != undefined) {
+          z = place[i].getElementsByTagName("input")
+          for(let x=0;x<z.length;x++){
+            if(z[x].placeholder.split(" - ")[1] != undefined && (z[x].placeholder = z[x].placeholder.split(" - ")[1])) z[x].parentNode.removeChild(z[x].parentNode.children[0])
+          }
+        }
+      }}catch(err){console.log(err)}
+      let code = document.querySelectorAll(".response-col_description__inner code")
+      for(let i=0;i<code.length;i++){
+        code[i].style.background = "#41444e"
+        code[i].style.color = "#ffffff"
+      }
+      let sel = document.querySelectorAll("select.content-type")
+      for(let i=0;i<sel.length;i++){
+        if(sel[i].childNodes.length <= 1)
+          sel[i].parentNode.parentNode.removeChild(sel[i].parentNode)
+      }
+    },100)
+  })
+
+    
+}
+</script>
+<style>
+    td.response-col_description {
+      padding: 0 0 0 0 !important;
+    }
+
+    td.col.col_header.response-col_links, td.response-col_links {
+      display: none !important;
+    }
+</style>
+</body>
+
+</html>

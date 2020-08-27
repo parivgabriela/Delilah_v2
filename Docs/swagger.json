@@ -1,0 +1,570 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "API para administrar pedidos. Te permite actuar desde dos roles, siendo un cliente puede consultar sobre los platos, sus pedidos e información personal. </br> En el rol de adminstrador puede crear nuevo platos, cambiar el stock, eliminar pedidos consultar todos los usuarios",
+    "version": "1.0.0",
+    "title": "Delilah Resto API",
+    "termsOfService": "http://swagger.io/terms/",
+    "contact": {
+      "email": "apiteam@swagger.io"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "host": "petstore.swagger.io",
+  "basePath": "/v2",
+  "tags": [
+    {
+      "name": "Delilah",
+      "description": "Administrador de pedidos"
+    }
+  ],
+  "schemes": [
+    "https",
+    "http"
+  ],
+  "paths": {
+    "/usuarios": {
+      "post": {
+        "tags": [
+          "usuarios"
+        ],
+        "summary": "Creación de un nuevo usuario",
+        "description": "",
+        "operationId": "nuevoUsuario",
+        "consumes": [
+          "application/json",
+          "application/xml"
+        ],
+        "produces": [
+          "application/xml",
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Objeto de un usuario que va ser añadido",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Usuario"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "El usuario fue creado correctamente"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "usuarios"
+        ],
+        "summary": "Consulta datos de un usuario si tiene rol cliente y muestra todos los usuarios si es rol administrador",
+        "description": "",
+        "operationId": "updatePet",
+        "consumes": [
+          "application/json",
+          "application/xml"
+        ],
+        "produces": [
+          "application/xml",
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Vista desde un usuario cliente",
+            "schema": {
+              "$ref": "#/definitions/UsuarioMostrar"
+            }
+          },
+          "201": {
+            "description": "Vista desde un usuario cliente admin",
+            "schema": {
+              "$ref": "#/definitions/UsuariosAdmin"
+            }
+          },
+          "401": {
+            "description": "Debe haber iniciado sesión previamente"
+          }
+        }
+      }
+    },
+    "/platos": {
+      "get": {
+        "tags": [
+          "Platos"
+        ],
+        "summary": "Consulta todos los platos",
+        "description": "",
+        "operationId": "getPlatos",
+        "consumes": [
+          "application/json",
+          "application/xml"
+        ],
+        "produces": [
+          "application/xml",
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Devuelve todos los platos de la base",
+            "schema": {
+              "$ref": "#/definitions/ListaPlatos"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Platos"
+        ],
+        "summary": "Ingreasa un nuevo plato a la base, solo lo puede hacer el rol admin",
+        "description": "",
+        "operationId": "postPlatos",
+        "consumes": [
+          "application/json",
+          "application/xml"
+        ],
+        "produces": [
+          "application/xml",
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Objeto de un usuario que va ser añadido",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Plato"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Su consulta fue realizada exitosamente"
+          },
+          "401": {
+            "description": "Credencial inválida, no puede ingresar"
+          }
+        }
+      }
+    },
+    "/platos/consulta/{id_plato}": {
+      "get": {
+        "tags": [
+          "Platos"
+        ],
+        "summary": "Consulta un plato",
+        "description": "",
+        "operationId": "getUnPlato",
+        "consumes": [
+          "application/json",
+          "application/xml"
+        ],
+        "produces": [
+          "application/xml",
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id_plato",
+            "in": "path",
+            "description": "ID del plato a eliminar",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/Plato"
+            }
+          },
+          "400": {
+            "description": "Datos incorrectos"
+          },
+          "401": {
+            "description": "Credencial inválida, no puede ingresar"
+          }
+        }
+      }
+    },
+    "/platos/{id_plato}/stock": {
+      "put": {
+        "tags": [
+          "Platos"
+        ],
+        "summary": "Actualizacion del stock de un plato",
+        "description": "",
+        "operationId": "StockUnPlato",
+        "consumes": [
+          "application/json",
+          "application/xml"
+        ],
+        "produces": [
+          "application/xml",
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Objeto de un elemento del stock",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Stock"
+            }
+          },
+          {
+            "name": "id_plato",
+            "in": "path",
+            "description": "ID del plato a modificar",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "La actualización fue realizada exitosamente"
+          },
+          "400": {
+            "description": "Datos incorrectos"
+          },
+          "401": {
+            "description": "Credencial inválida, no puede ingresar"
+          }
+        }
+      }
+    },
+    "/platos/{id_plato}/eliminar": {
+      "delete": {
+        "tags": [
+          "Platos"
+        ],
+        "summary": "Elimina un plato",
+        "description": "",
+        "operationId": "deleteUnPlato",
+        "produces": [
+          "application/xml",
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id_plato",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "La actualización fue realizada exitosamente"
+          },
+          "400": {
+            "description": "Datos incorrectos"
+          },
+          "401": {
+            "description": "Credencial inválida, no puede ingresar"
+          }
+        }
+      }
+    },
+    "/pedidos": {
+      "post": {
+        "tags": [
+          "Pedidos"
+        ],
+        "summary": "Creación de un nuevo usuario",
+        "description": "",
+        "operationId": "nuevoPedido",
+        "consumes": [
+          "application/json",
+          "application/xml"
+        ],
+        "produces": [
+          "application/xml",
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Objeto de un usuario que va ser añadido",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Pedido"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pedido ingresado exitosamente"
+          },
+          "400": {
+            "description": "Debe haber iniciado sesión previamente"
+          }
+        }
+      }
+    },
+    "/pedidos/{id_pedido}": {
+      "delete": {
+        "tags": [
+          "Pedidos"
+        ],
+        "summary": "Elimina un pedido",
+        "description": "",
+        "operationId": "deleteUnPedido",
+        "produces": [
+          "application/xml",
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id_pedido",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "La actualización fue realizada exitosamente"
+          },
+          "400": {
+            "description": "Datos incorrectos"
+          },
+          "401": {
+            "description": "Credencial inválida, no puede ingresar"
+          }
+        }
+      }
+    },
+    "/pedidos/{id_pedido}/estado": {
+      "put": {
+        "tags": [
+          "Pedidos"
+        ],
+        "summary": "Actualiza el estado de un pedido",
+        "description": "",
+        "operationId": "actualizaUnPedido",
+        "produces": [
+          "application/xml",
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Estado",
+            "in": "body",
+            "description": "Objeto de un elemento del stock: Nuevo,Confirmado,Preparando,Enviado,Cancelado,Entregado",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Estado"
+            }
+          },
+          {
+            "name": "id_pedido",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "La actualización fue realizada exitosamente"
+          },
+          "400": {
+            "description": "Datos incorrectos"
+          },
+          "401": {
+            "description": "Credencial inválida, no puede ingresar"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Usuario": {
+      "type": "object",
+      "required": [
+        "name",
+        "photoUrls"
+      ],
+      "properties": {
+        "usuario": {
+          "type": "string",
+          "example": "Carla Cor"
+        },
+        "nombre_apellido": {
+          "type": "string",
+          "example": "doggie"
+        },
+        "mail": {
+          "type": "string",
+          "example": "carla@gmail.com"
+        },
+        "password": {
+          "type": "string",
+          "example": "123456",
+          "xml": {
+            "name": "photoUrl",
+            "wrapped": true
+          },
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "UsuarioMostrar": {
+      "type": "object",
+      "required": [
+        "name",
+        "photoUrls"
+      ],
+      "properties": {
+        "usuario": {
+          "type": "string",
+          "example": "Carla Cor"
+        },
+        "nombre_apellido": {
+          "type": "string",
+          "example": "doggie"
+        },
+        "mail": {
+          "type": "string",
+          "example": "carla@gmail.com",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "UsuarioMail": {
+      "type": "object",
+      "properties": {
+        "mail": {
+          "type": "string",
+          "example": "carla@gmail.com"
+        },
+        "password": {
+          "type": "string",
+          "example": "123456"
+        }
+      }
+    },
+    "UsuarioUsuario": {
+      "type": "object",
+      "properties": {
+        "usuario": {
+          "type": "string",
+          "example": "carla_cor"
+        },
+        "password": {
+          "type": "string",
+          "example": "123456"
+        }
+      }
+    },
+    "UsuariosAdmin": {
+      "type": "object",
+      "properties": {
+        "usuarios": {
+          "type": "array",
+          "xml": {
+            "name": "UsuarioMostrar",
+            "wrapped": true
+          },
+          "items": {
+            "$ref": "#/definitions/UsuarioMostrar"
+          }
+        }
+      }
+    },
+    "Plato": {
+      "type": "object",
+      "properties": {
+        "nombre_plato": {
+          "type": "string"
+        },
+        "precio": {
+          "type": "string"
+        },
+        "stock": {
+          "type": "string"
+        },
+        "url_plato": {
+          "type": "string"
+        }
+      }
+    },
+    "ListaPlatos": {
+      "type": "object",
+      "properties": {
+        "platos": {
+          "type": "array",
+          "xml": {
+            "name": "Plato",
+            "wrapped": true
+          },
+          "items": {
+            "$ref": "#/definitions/Plato"
+          }
+        }
+      }
+    },
+    "Pedido": {
+      "type": "object",
+      "properties": {
+        "t_pago": {
+          "type": "string"
+        },
+        "usuario": {
+          "type": "string"
+        },
+        "domicilio": {
+          "type": "string"
+        },
+        "total": {
+          "type": "string"
+        },
+        "carrito": {
+          "type": "array",
+          "xml": {
+            "name": "Plato",
+            "wrapped": true
+          },
+          "items": {
+            "$ref": "#/definitions/Plato"
+          }
+        }
+      }
+    },
+    "Stock": {
+      "type": "object",
+      "properties": {
+        "stock": {
+          "type": "string"
+        }
+      }
+    },
+    "Estado": {
+      "type": "object",
+      "properties": {
+        "estado_pedido": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

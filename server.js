@@ -3,11 +3,10 @@ const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const utils = require('./utils');
 const sqlite = require('sqlite3');
-const database = require('./DB/db');
 const util = require('util');
 const { json } = require('body-parser');
 var info_plato;
-const db = new sqlite.Database('./delilah.sqlite', (err) => console.log(err));
+const db = new sqlite.Database('./delila.sqlite', (err) => console.log(err));
 var is_admin = 0;
 var id_usuario = 5,
     id_pedido = 10,
@@ -19,9 +18,9 @@ const api = express();
 api.use(bodyParser.json());
 
 function inicializarDB() {
-    db.serialize(function() {
 
-        db.run("CREATE TABLE IF NOT EXISTS usuarios  ( id_usuario INT PRIMARY KEY NOT NULL, usuario VARCHAR (60) NOT NULL, nombre_apellido VARCHAR (60) NOT NULL, mail VARCHAR(60) NOT NULL, telefono VARCHAR(20) NOT NULL, domicilio VARCHAR (60) NOT NULL, password VARCHAR(20) NOT NULL, is_admin BOOLEAN NOT NULL DEFAULT FALSE)");
+    db.serialize(function() {
+        db.run("CREATE TABLE IF NOT EXISTS usuarios ( id_usuario INT PRIMARY KEY NOT NULL, usuario VARCHAR (60) NOT NULL, nombre_apellido VARCHAR (60) NOT NULL, mail VARCHAR(60) NOT NULL, telefono VARCHAR(20) NOT NULL, domicilio VARCHAR (60) NOT NULL, password VARCHAR(20) NOT NULL, is_admin BOOLEAN NOT NULL DEFAULT FALSE)");
         db.run('CREATE TABLE IF NOT EXISTS pedidos (id_pedido INT PRIMARY KEY NOT NULL,t_pago INT NOT NULL,estado_pedido INT NOT NULL,date DATETIME NOT NULL,total VARCHAR(20) NOT NULL,usuario VARCHAR (60) NOT NULL,id_carrito INT NOT NULL)');
         db.run('CREATE TABLE IF NOT EXISTS platos (id_plato INT PRIMARY KEY ,nombre_plato VARCHAR (60) NOT NULL,precio FLOAT NOT NULL,stock INT NOT NULL,url_plato VARCHAR(200) NOT NULL)');
         db.run('CREATE TABLE IF NOT EXISTS carritos (id_carrito INT PRIMARY KEY,id_pedido INT NOT NULL,id_plato INT NOT NULL,cantidad INT NOT NULL)');
@@ -45,7 +44,8 @@ function verifyToken(req, res, next) {
         req.token = bearerToken;
         next();
     } else {
-        res.sendStatus(403);
+        res.status(utils.estadoDeServer.statusErrorCredenciales).send(utils.mensajeServer.statusErrorCredencialesMensaje);
+
     }
 
 }
@@ -93,7 +93,7 @@ api.get('/usuarios', (req, res) => {
     }
 });
 
-api.post('/login', (req, res) => {
+api.post('/usuarios/login', (req, res) => {
   const { usuario, mail, password } = req.body;
 console.log(password);
     if (typeof mail === 'undefined') {
@@ -183,6 +183,7 @@ api.post('/pedidos', (req, res) => {
     }else{
         console.log(error);
         console.log(utils.estadoDeServer.statusErrorCliente);
+        res.status(utils.estadoDeServer.statusErrorCredenciales).send(utils.mensajeServer.statusPrevioLogueo);
     }    
 
 });
@@ -204,28 +205,32 @@ api.post('/platos',verifyToken, (req, res) => {
         db.serialize(function() {
             db.run("INSERT INTO platos VALUES (?,?,?,?,?)", id_plato, nombre_plato, precio, stock, url_plato);
             id_plato++;
-            res.send(utils.mensajeServer.statusOkConsulta);
             res.status(utils.estadoDeServer.statusOk);
+            res.send(utils.mensajeServer.statusOkConsulta);
         });
     }else{
         res.status(utils.estadoDeServer.statusErrorCredenciales).send(utils.mensajeServer.statusErrorCredencialesMensaje);
     }
 });
-api.get('/platos/:id_plato', verifyToken, (req, res) => {
+api.get('/platos/:id_plato', (req, res) => {
     let un_id_plato = req.params.id_plato;
     let un_plato;
-    if(is_admin){
+ 
         db.all('SELECT * FROM platos WHERE id_plato=?',un_id_plato, (err, resultados) => {
-            un_plato=JSON.stringify(resultados[0]);
-            res.status(utils.estadoDeServer.statusOk).send(JSON.parse(un_plato));
+            
+            if(resultados.length>0){
+                un_plato=JSON.stringify(resultados[0]);
+                res.status(utils.estadoDeServer.statusOk).send(JSON.parse(un_plato));
+            }
+            else{
+                res.status(utils.estadoDeServer.statusErrorCliente).send(utils.mensajeServer.statusErrorClienteMensaje);
+            }
+            
         });
-    }else{
-        res.status(utils.estadoDeServer.statusErrorCredenciales).send(utils.mensajeServer.statusErrorCredencialesMensaje);
-    }
        
 });
 
-api.put('/platos/:id_plato', verifyToken, (req, res) => {
+api.put('/platos/:id_plato/stock', verifyToken, (req, res) => {
     let un_id_plato = req.params.id_plato;
     const {stock}=req.body;
     if(is_admin){
@@ -235,24 +240,32 @@ api.put('/platos/:id_plato', verifyToken, (req, res) => {
             res.send(utils.mensajeServer.statusOkActualizacion);
         });
     }else{
-        res.status(utils.estadoDeServer.statusErrorCredenciales).send(utils.mensajeServer.statusErrorCredencialesMensaje);
+        res.status(utils.estadoDeServer.statusErrorCliente).send(utils.mensajeServer.statusErrorClienteMensaje);
     }
        
 });
 api.delete('/platos/:id_plato', verifyToken, (req, res) => {
     let un_id_plato = req.params.id_plato;
-    if(is_admin){
-        db.all('DELETE platos WHERE id_plato=?',un_id_plato, (err, resultados) => {
-            //un_plato=JSON.stringify(resultados[0]);
-            res.status(utils.estadoDeServer.statusOk);
-            res.send(utils.mensajeServer.statusOkActualizacion);
-        });
-    }else{
-        res.status(utils.estadoDeServer.statusErrorCredenciales).send(utils.mensajeServer.statusErrorCredencialesMensaje);
-    }
+    db.all('SELECT * FROM platos WHERE id_plato=?',un_id_plato, (err, resultados) => {
+        if(resultados.length>0)
+        {
+            db.all('DELETE platos WHERE id_plato=?',un_id_plato, (err, resultados) => {
+                //un_plato=JSON.stringify(resultados[0]);
+    
+                res.status(utils.estadoDeServer.statusOk);
+                res.send(utils.mensajeServer.statusOkActualizacion);
+            });
+        }
+        else{
+            res.status(utils.estadoDeServer.statusErrorCliente).send(utils.mensajeServer.statusErrorClienteMensaje);
+        }
+    })
+        
+
+
        
 });
-api.put('/pedidos/:id_pedido',(req,res)=>{
+api.put('/pedidos/:id_pedido/estado',verifyToken,(req,res)=>{
 const {estado_pedido}=req.body;
 let un_id_pedido = req.params.id_pedido;
 if(is_admin){
@@ -261,7 +274,7 @@ if(is_admin){
         res.send(utils.mensajeServer.statusOkActualizacion);
     });
 }else{
-    res.status(utils.estadoDeServer.statusErrorCredenciales).send(utils.mensajeServer.statusErrorCredencialesMensaje);
+    res.status(utils.estadoDeServer.statusErrorCliente).send(utils.mensajeServer.statusErrorClienteMensaje);
 }
 
 });
