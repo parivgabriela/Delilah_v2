@@ -13,6 +13,7 @@ var id_usuario = 5,
     id_carrito = 20,
     id_plato = 51;
 var usuario_activo = 0; 
+var usuario_user;
 const not_admin=0;
 const api = express();
 api.use(bodyParser.json());
@@ -20,19 +21,12 @@ api.use(bodyParser.json());
 function inicializarDB() {
 
     db.serialize(function() {
-        db.run("CREATE TABLE IF NOT EXISTS usuarios ( id_usuario INT PRIMARY KEY NOT NULL, usuario VARCHAR (60) NOT NULL, nombre_apellido VARCHAR (60) NOT NULL, mail VARCHAR(60) NOT NULL, telefono VARCHAR(20) NOT NULL, domicilio VARCHAR (60) NOT NULL, password VARCHAR(20) NOT NULL, is_admin BOOLEAN NOT NULL DEFAULT FALSE)");
-        db.run('CREATE TABLE IF NOT EXISTS pedidos (id_pedido INT PRIMARY KEY NOT NULL,t_pago INT NOT NULL,estado_pedido INT NOT NULL,date DATETIME NOT NULL,total VARCHAR(20) NOT NULL,usuario VARCHAR (60) NOT NULL,id_carrito INT NOT NULL)');
-        db.run('CREATE TABLE IF NOT EXISTS platos (id_plato INT PRIMARY KEY ,nombre_plato VARCHAR (60) NOT NULL,precio FLOAT NOT NULL,stock INT NOT NULL,url_plato VARCHAR(200) NOT NULL)');
-        db.run('CREATE TABLE IF NOT EXISTS carritos (id_carrito INT PRIMARY KEY,id_pedido INT NOT NULL,id_plato INT NOT NULL,cantidad INT NOT NULL)');
+        db.run("DROP TABLE IF EXISTS usuarios");
+        db.run("DROP TABLE IF EXISTS pedidos");
+        db.run("DROP TABLE IF EXISTS platos");
+        db.run("DROP TABLE IF EXISTS carritos");
 
-    });
-    db.serialize(function() {
-        db.all('INSERT INTO usuarios VALUES (1,"admin","admin","admin@gmail.com","4343456","ESTADOS UNIDOS 444","1234",TRUE)');
-        db.all('INSERT INTO usuarios VALUES (2,"3user","Fulani TE","aa@gmail.com","4343456","La plata 444","1234",FALSE)');
-        db.all('INSERT INTO usuarios VALUES (3,"4user","Fulani TI","aa@gmail.com","4343456","Juramento 444","1234",FALSE)');
-        db.all('INSERT INTO usuarios VALUES (4,"5user","Fulani TO","aa@gmail.com","4343456","Jujuy 444","1234",FALSE)');
-        db.all('INSERT INTO platos VALUES (50,"pizza","300",2,"https://www.delonghi.com/Global/recipes/multifry/pizza_fresca.jpg")');
-    });
+        });
 }
 inicializarDB();
 
@@ -45,9 +39,7 @@ function verifyToken(req, res, next) {
         next();
     } else {
         res.status(utils.estadoDeServer.statusErrorCredenciales).send(utils.mensajeServer.statusErrorCredencialesMensaje);
-
     }
-
 }
 
 api.listen(3000, (req, res) => {
@@ -73,15 +65,19 @@ api.post('/usuarios', (req, res) => {
 
 api.get('/usuarios', (req, res) => {
     if (usuario_activo && is_admin) {
+        console.log("is admin");
+
         let unUsuario;
         console.log("Consulta de admin");
             db.all('SELECT usuario,nombre_apellido,mail,telefono,domicilio from usuarios', (err, resultados) => {
-            console.log("admin res"+resultados);
-            res.status(utils.estadoDeServer.statusOk).send(resultados);
+            console.log(resultados);
+                res.status(utils.estadoDeServer.statusOk).send(resultados);
             });
     } else {
+        console.log("not admin");
         if(usuario_activo){
             db.all('SELECT usuario,nombre_apellido,mail,telefono,domicilio from usuarios where id_usuario=?',usuario_activo, (err, resultados) => {
+            console.log(resultados);
                 res.status(utils.estadoDeServer.statusOk).send(resultados);
             });
         }
@@ -95,13 +91,17 @@ api.get('/usuarios', (req, res) => {
 
 api.post('/usuarios/login', (req, res) => {
   const { usuario, mail, password } = req.body;
-console.log(password);
+  let unapass;
+  console.log(usuario+mail+password);
     if (typeof mail === 'undefined') {
+        db.serialize(function() {
             db.all('SELECT id_usuario,usuario,password,is_admin from usuarios where usuario=?', usuario, (err, resultados) => {
-              if(resultados.length>0){
-                if(resultados[0].password===password && (!err)){
+                unapass=JSON.stringify(resultados[0].password);
+                if(JSON.parse(unapass)===password){
+                    console.log(resultados);
                     console.log("ingreso exitoso");
                     usuario_activo=resultados[0].id_usuario;
+                    usuario_user=resultados[0].usuario;
                     if(resultados[0].is_admin)
                     {
                         is_admin=1;
@@ -116,19 +116,15 @@ console.log(password);
                    }else{
                     res.status(utils.estadoDeServer.statusErrorCliente);
                     res.send(utils.mensajeServer.statusErrorClienteMensaje);
-                   }  
-              }else{
-                res.status(utils.estadoDeServer.statusErrorCliente);
-                res.send(utils.mensajeServer.statusErrorClienteMensaje);
-              }
-                             
-            });
-        
-    } else {
-       
+                   }                  
+            });   
+        });    
+    } else {     
+        db.serialize(function() {
             db.all('SELECT id_usuario,usuario,password,is_admin FROM usuarios WHERE mail=?', mail, (err, resultados) => {
-                if(resultados.length>0){
-                    if(resultados[0].password===password && (!err)){
+                if(resultados){
+                    unapass=JSON.stringify(resultados[0].password);
+                    if(JSON.parse(unapass)===password){
                         console.log("ingreso exitoso");
                         usuario_activo=resultados[0].id_usuario;
                         if(resultados[0].is_admin)
@@ -151,21 +147,17 @@ console.log(password);
                     res.send(utils.mensajeServer.statusErrorClienteMensaje);
                   }
             });
-    }
+    });
+}
 });
 
-
-api.get('/platos', (req, res, next) => {
-        db.all('SELECT nombre_plato,precio,stock,url_plato from platos', (err, resultados) => {
+api.get('/platos', (req, res) => {
+        db.all('SELECT * from platos', (err, resultados) => {
             let unPlato;
             console.log(utils.mensajeServer.statusOkConsulta);   
-            unPlato=JSON.stringify(resultados);
-            res.status(utils.estadoDeServer.statusOk).send(JSON.parse(unPlato));
+            res.status(utils.estadoDeServer.statusOk).send(resultados);
         });
-    
-});
-
-
+}); 
 
 api.post('/pedidos', (req, res) => {
     //verificar que el usuario este activo--> se haya logueado
@@ -196,9 +188,26 @@ api.delete('/pedidos/:id_pedido', verifyToken, (req, res) => {
         });
     }else{
         res.status(utils.estadoDeServer.statusErrorCredenciales).send(utils.mensajeServer.statusErrorCredencialesMensaje);
-    }
-       
+    }  
 });
+api.get('/pedidos/',(req,res)=>{
+    if(usuario_activo){
+       if(is_admin){
+        db.all('SELECT * from pedidos', (err, resultados) => {
+            console.log(resultados);
+                res.status(utils.estadoDeServer.statusOk).send(resultados);
+            });
+       }
+       else{
+            db.all('SELECT * from pedidos where usuario=?',usuario_user, (err, resultados) => {
+            console.log(resultados);
+                res.status(utils.estadoDeServer.statusOk).send(resultados);
+            });
+       }
+    }else{
+        res.status(utils.estadoDeServer.statusErrorCredenciales).send(utils.mensajeServer.statusErrorCredencialesMensaje);
+    }  
+})
 api.post('/platos',verifyToken, (req, res) => {
     const { nombre_plato, precio, url_plato, stock } = req.body;
     if(is_admin){
@@ -215,19 +224,16 @@ api.post('/platos',verifyToken, (req, res) => {
 api.get('/platos/:id_plato', (req, res) => {
     let un_id_plato = req.params.id_plato;
     let un_plato;
- 
         db.all('SELECT * FROM platos WHERE id_plato=?',un_id_plato, (err, resultados) => {
-            
-            if(resultados.length>0){
-                un_plato=JSON.stringify(resultados[0]);
+            console.log(resultados);
+            if(resultados){
+                un_plato=JSON.stringify(resultados);
                 res.status(utils.estadoDeServer.statusOk).send(JSON.parse(un_plato));
             }
             else{
                 res.status(utils.estadoDeServer.statusErrorCliente).send(utils.mensajeServer.statusErrorClienteMensaje);
             }
-            
         });
-       
 });
 
 api.put('/platos/:id_plato/stock', verifyToken, (req, res) => {
@@ -247,11 +253,9 @@ api.put('/platos/:id_plato/stock', verifyToken, (req, res) => {
 api.delete('/platos/:id_plato', verifyToken, (req, res) => {
     let un_id_plato = req.params.id_plato;
     db.all('SELECT * FROM platos WHERE id_plato=?',un_id_plato, (err, resultados) => {
-        if(resultados.length>0)
+        if(resultados)
         {
             db.all('DELETE platos WHERE id_plato=?',un_id_plato, (err, resultados) => {
-                //un_plato=JSON.stringify(resultados[0]);
-    
                 res.status(utils.estadoDeServer.statusOk);
                 res.send(utils.mensajeServer.statusOkActualizacion);
             });
@@ -259,11 +263,7 @@ api.delete('/platos/:id_plato', verifyToken, (req, res) => {
         else{
             res.status(utils.estadoDeServer.statusErrorCliente).send(utils.mensajeServer.statusErrorClienteMensaje);
         }
-    })
-        
-
-
-       
+    }) 
 });
 api.put('/pedidos/:id_pedido/estado',verifyToken,(req,res)=>{
 const {estado_pedido}=req.body;
@@ -278,10 +278,30 @@ if(is_admin){
 }
 
 });
+
+api.post('/db/init',(req,res)=>{
+    const {unaquery}=req.body;
+    db.serialize(function() {
+        db.run(unaquery);
+        console.log("ok");
+        res.status(utils.estadoDeServer.statusOk).send(utils.mensajeServer.statusDBOK);
+    })
+})
 api.get('/logout',(req,res)=>{
     usuario_activo=0;
     is_admin=0;
     res.status(utils.estadoDeServer.statusOk);
     res.send(utils.mensajeServer.statusLogoutMensaje);
 })
+function crearDB(){
+    
+    db.serialize(function() {
+        db.run("CREATE TABLE IF NOT EXISTS usuarios ( id_usuario INT PRIMARY KEY NOT NULL, usuario VARCHAR (60) NOT NULL, nombre_apellido VARCHAR (60) NOT NULL, mail VARCHAR(60) NOT NULL, telefono VARCHAR(20) NOT NULL, domicilio VARCHAR (60) NOT NULL, password VARCHAR(20) NOT NULL, is_admin BOOLEAN NOT NULL DEFAULT FALSE)");
+        db.run("CREATE TABLE IF NOT EXISTS pedidos (id_pedido INT PRIMARY KEY NOT NULL,t_pago INT NOT NULL,estado_pedido INT NOT NULL,date DATETIME NOT NULL,total VARCHAR(20) NOT NULL,usuario VARCHAR (60) NOT NULL,id_carrito INT NOT NULL)");
+        db.run("CREATE TABLE IF NOT EXISTS platos (id_plato INT PRIMARY KEY ,nombre_plato VARCHAR (60) NOT NULL,precio FLOAT NOT NULL,stock INT NOT NULL,url_plato VARCHAR(200) NOT NULL)");
+        db.run("CREATE TABLE IF NOT EXISTS carritos (id_carrito INT PRIMARY KEY,id_pedido INT NOT NULL,id_plato INT NOT NULL,cantidad INT NOT NULL)");
+        db.run("INSERT INTO usuarios VALUES (1,'admin','admin','admin@gmail.com','4343456','ESTADOS UNIDOS 444','1234',TRUE)");
 
+        });
+}
+//crearDB();

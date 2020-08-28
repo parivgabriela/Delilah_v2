@@ -10,6 +10,7 @@ const statusOk = 200,
     statusOkValidacionMensaje="Usuario verificado",
     statusOkPedidoMensaje="Pedido ingresado exitosamente",
     statusOkConsulta="Su consulta fue realizada exitosamente",
+    statusDBOK="Query ejecutada correctamente",
     statusUsuarioNuevoOk="El usuario fue creado correctamente",
     statusOkActualizacion="La actualización fue realizada exitosamente",
     statusLogoutMensaje="Cerro sesión",
@@ -21,8 +22,8 @@ const statusOk = 200,
     statusErrorServidorMensaje='Internal Server Error',//Internal Server Error
     statusCargadoCarritoMensaje="Se cargo en el carrito";
 //def estados de los pedidos
-const pedidoNuevo=10,pedidoConfirmado=20,pedidoPreparado=30,pedidoEnviado=40,pedidoCancelado=50,
-pedidoEntregado=60;
+const pedidoNuevo="Neuvo",pedidoConfirmado="Confirmadp",pedidoPreparado="Preparado",pedidoEnviado="Enviado",pedidoCancelado="Cancelado",
+pedidoEntregado="Entregado";
 
 const estadoPedidos={
     pedidoNuevo,pedidoConfirmado,pedidoPreparado,pedidoEnviado,pedidoCancelado,pedidoEntregado
@@ -37,6 +38,7 @@ const estadoDeServer={
         statusOkValidacionMensaje,
         statusOkPedidoMensaje,
         statusOkConsulta,
+        statusDBOK,
         statusUsuarioNuevoOk,
         statusOkActualizacion,
         statusLogoutMensaje,

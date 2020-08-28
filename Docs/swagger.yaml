@@ -216,6 +216,23 @@ paths:
           description: "Pedido ingresado exitosamente"
         "400":
           description: "Debe haber iniciado sesión previamente"
+    get:
+      tags:
+      - "Pedidos"
+      summary: "Consulta todos los pedidos del rol admin"
+      description: ""
+      operationId: "getPedidos"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        "200":
+          description: "Devuelve todos los platos de la base"
+          schema:
+            $ref: '#/definitions/UnPedido'
   /pedidos/{id_pedido}:
     delete:
       tags:
@@ -378,6 +395,20 @@ definitions:
           wrapped: true
         items:
           $ref: "#/definitions/Plato"
+  UnPedido:
+    type: "object"
+    properties:
+      t_pago:
+        type: "string"
+      estado_pedido:
+        type: "string"
+      usuario:
+        type: "string"
+      domicilio:
+        type: "string"
+      total:
+        type: "string"
+
   Stock:
     type: "object"
     properties:
